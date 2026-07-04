@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body {
+          background-color: #E9FFF9;
+    }
+}
+
+@layer components {
+    .tag {
+          @apply inline-block rounded-full bg-frost/30 px-3 py-1 text-xs uppercase tracking-wide text-ink;
+    }
+    .btn {
+          @apply inline-block rounded-lg border border-ink/20 px-5 py-2.5 font-display font-semibold text-sm text-ink bg-paper transition-colors duration-150 hover:border-ink/40 hover:bg-ink/5;
+    }
+    .btn-solid {
+          @apply inline-block rounded-lg px-5 py-2.5 font-display font-semibold text-sm text-paper bg-siren transition-colors duration-150 hover:bg-siren/90;
+    }
+    .prose-dumb a {
+          @apply text-cerulean underline decoration-2 underline-offset-2 hover:text-siren;
+    }
+    .prose-dumb h2 {
+          @apply font-display font-bold text-2xl mt-10 mb-3;
+    }
+    .prose-dumb h3 {
+          @apply font-display font-bold text-xl mt-8 mb-2;
+    }
+    .prose-dumb p {
+          @apply mb-5 leading-relaxed;
+    }
+    .prose-dumb ul {
+          @apply list-disc pl-6 mb-5 space-y-1;
+    }
+    .prose-dumb blockquote {
+          @apply border-l-4 border-frost pl-4 italic text-slate my-6;
+    }
+}
