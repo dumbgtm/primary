@@ -1,0 +1,58 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Contact" description="Say hi, pitch a rebuttal, or get notified about operator sessions.">
+  <section class="max-w-3xl mx-auto px-6 pt-16 pb-24">
+    <p class="tag mb-6">no chatbots, promise</p>
+    <h1 class="font-display font-extrabold text-3xl sm:text-5xl mb-6 leading-tight text-ink">Say something.</h1>
+    <p class="text-lg mb-10 max-w-xl text-ink/80">
+      Rebuttal to a post, a piece of GTM slop we need to see, or you want first dibs when
+      operator sessions go live — this box handles all of it.
+    </p>
+
+    <!--
+      Wire this form to Formspree (or any form backend) before launch:
+      1. Create a free form at https://formspree.io
+      2. Replace YOUR_FORM_ID below with the endpoint they give you.
+      Until then this form won't actually send anywhere.
+    -->
+    <form
+      action="https://formspree.io/f/YOUR_FORM_ID"
+      method="POST"
+      class="space-y-5 rounded-2xl border border-ink/10 bg-white/40 p-6 sm:p-8"
+    >
+      <div>
+        <label for="name" class="block font-display font-semibold text-xs uppercase tracking-wide mb-1 text-ink">Name</label>
+        <input id="name" name="name" type="text" required
+          class="w-full rounded-lg border border-ink/20 bg-paper px-3 py-2 focus:outline-none focus:ring-2 focus:ring-siren/40 focus:border-siren" />
+      </div>
+      <div>
+        <label for="email" class="block font-display font-semibold text-xs uppercase tracking-wide mb-1 text-ink">Email</label>
+        <input id="email" name="email" type="email" required
+          class="w-full rounded-lg border border-ink/20 bg-paper px-3 py-2 focus:outline-none focus:ring-2 focus:ring-siren/40 focus:border-siren" />
+      </div>
+      <div>
+        <label for="message" class="block font-display font-semibold text-xs uppercase tracking-wide mb-1 text-ink">Message</label>
+        <textarea id="message" name="message" rows="5" required
+          class="w-full rounded-lg border border-ink/20 bg-paper px-3 py-2 focus:outline-none focus:ring-2 focus:ring-siren/40 focus:border-siren"></textarea>
+      </div>
+      <fieldset class="rounded-xl border border-ink/15 p-4">
+        <legend class="font-display font-semibold text-xs uppercase tracking-wide px-1 text-ink">Notify me about</legend>
+        <label class="flex items-center gap-2 text-sm mb-2 text-ink/80">
+          <input type="checkbox" name="interest" value="operator" class="rounded border-ink/30" />
+          Signing up as a GTM operator
+        </label>
+        <label class="flex items-center gap-2 text-sm text-ink/80">
+          <input type="checkbox" name="interest" value="booking" class="rounded border-ink/30" />
+          Booking a paid session
+        </label>
+      </fieldset>
+      <button type="submit" class="btn-solid">Send it</button>
+    </form>
+
+    <p class="mt-8 text-sm text-slate">
+      Prefer email? <a href="mailto:hello@dumbgtm.com" class="text-cerulean underline decoration-2 underline-offset-2 hover:text-siren">hello@dumbgtm.com</a>
+      (forwarding to be set up in Cloudflare — see project README).
+    </p>
+  </section>
+</BaseLayout>
