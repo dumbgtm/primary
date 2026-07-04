@@ -1,0 +1,89 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
+
+const bits = [
+  {
+    title: 'We say the quiet part',
+    body: "Your GTM plan is not a moat. Most tactics being sold to you right now are the same five ideas with a new coat of paint. We point at the paint.",
+  },
+  {
+    title: 'No frameworks with acronyms',
+    body: "If it needs a 40-slide deck and a consultant to explain it, it's not a strategy, it's a hostage situation. We keep it dumb on purpose.",
+  },
+  {
+    title: 'Built by someone who does this',
+    body: 'Not a former VP who pivoted to "thought leadership." Actual GTM work, actual opinions, occasionally actually funny.',
+  },
+];
+---
+<BaseLayout title="Home">
+  <section class="max-w-5xl mx-auto px-6 pt-16 pb-20">
+    <p class="tag mb-6">est. 2026 &middot; contrarian by design</p>
+    <h1 class="font-display font-extrabold text-4xl sm:text-6xl leading-[1.05] max-w-3xl text-ink">
+      Go-to-market advice for people tired of being lied to about go-to-market.
+    </h1>
+    <p class="mt-6 text-lg sm:text-xl max-w-2xl text-ink/80">
+      dumbGTM calls out the slop: the AI SDR spam, the "10x your pipeline" grifters, the
+      frameworks nobody needed. We keep the ideas dumb and obvious on purpose — because
+      that's usually what actually works.
+    </p>
+    <div class="mt-8 flex flex-wrap gap-3">
+      <a href="/blog" class="btn-solid">Read the blog</a>
+      <a href="/contact" class="btn">Book a session (soon)</a>
+    </div>
+  </section>
+
+  <section class="bg-ink text-paper">
+    <div class="max-w-5xl mx-auto px-6 py-14 grid sm:grid-cols-3 gap-10">
+      {bits.map((bit) => (
+        <div>
+          <h2 class="font-display font-bold text-xl mb-2">{bit.title}</h2>
+          <p class="text-paper/70 text-sm leading-relaxed">{bit.body}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="max-w-5xl mx-auto px-6 py-16">
+    <div class="flex items-baseline justify-between mb-8">
+      <h2 class="font-display font-bold text-2xl sm:text-3xl text-ink">Latest slop we've called out</h2>
+      <a href="/blog" class="text-sm text-cerulean underline decoration-2 underline-offset-2 hover:text-siren">
+        All posts &rarr;
+      </a>
+    </div>
+
+    {posts.length === 0 ? (
+      <p class="text-slate">First posts are being written. Check back soon.</p>
+    ) : (
+      <div class="grid sm:grid-cols-3 gap-6">
+        {posts.map((post) => (
+          <a href={`/blog/${post.slug}`} class="block rounded-xl border border-ink/10 bg-white/40 p-5 hover:bg-frost/20 hover:border-ink/20 transition-colors">
+            <p class="text-xs uppercase tracking-wide text-slate mb-2">
+              {post.data.pubDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+            </p>
+            <h3 class="font-display font-bold text-lg mb-2 leading-snug text-ink">{post.data.title}</h3>
+            <p class="text-sm text-ink/70">{post.data.description}</p>
+          </a>
+        ))}
+      </div>
+    )}
+  </section>
+
+  <section class="max-w-5xl mx-auto px-6 pb-24">
+    <div class="rounded-2xl bg-frost/20 p-8 sm:p-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+      <div>
+        <h2 class="font-display font-bold text-2xl mb-2 text-ink">Want an hour with someone who's actually done this?</h2>
+        <p class="text-ink/70 max-w-xl">
+          We're building a way to book paid, hourly sessions with real GTM operators —
+          no retainers, no decks, just answers. Operator sign-ups and booking are coming soon.
+        </p>
+      </div>
+      <a href="/contact" class="btn-solid whitespace-nowrap">Get notified</a>
+    </div>
+  </section>
+</BaseLayout>
