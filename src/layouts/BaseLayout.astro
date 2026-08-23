@@ -14,6 +14,14 @@ interface Props {
 }
 
 const { title, description = "GTM advice that isn't trying to sell you a retainer." } = Astro.props;
+
+// TODO: replace with your real GA4 Measurement ID (Admin → Data Streams → your stream)
+const GA4_MEASUREMENT_ID = 'G-K3N90FXN62';
+// TODO: replace with your real Cloudflare Web Analytics token (Analytics & Logs → Web Analytics → Manage site)
+const CF_ANALYTICS_TOKEN = 'YOUR-CLOUDFLARE-BEACON-TOKEN';
+
+const ga4Enabled = GA4_MEASUREMENT_ID !== 'G-XXXXXXXXXX';
+const cfAnalyticsEnabled = CF_ANALYTICS_TOKEN !== 'YOUR-CLOUDFLARE-BEACON-TOKEN';
 ---
 <!doctype html>
 <html lang="en">
@@ -26,6 +34,17 @@ const { title, description = "GTM advice that isn't trying to sell you a retaine
     <meta property="og:title" content={`${title} · dumbGTM`} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    {ga4Enabled && (
+      <Fragment>
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA4_MEASUREMENT_ID}`}></script>
+        <script define:vars={{ GA4_MEASUREMENT_ID }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag() { dataLayer.push(arguments); }
+          gtag('js', new Date());
+          gtag('config', GA4_MEASUREMENT_ID);
+        </script>
+      </Fragment>
+    )}
   </head>
   <body class="font-body text-ink min-h-screen flex flex-col">
     <Header />
@@ -33,5 +52,8 @@ const { title, description = "GTM advice that isn't trying to sell you a retaine
       <slot />
     </main>
     <Footer />
+    {cfAnalyticsEnabled && (
+      <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon={`{"token": "${CF_ANALYTICS_TOKEN}"}`}></script>
+    )}
   </body>
 </html>
