@@ -1,25 +1,27 @@
 ---
 const navItems = [
   { href: '/', label: 'Home' },
+  { href: '/takes', label: 'Takes' },
   { href: '/blog', label: 'Blog' },
+  { href: '/manifesto', label: 'Manifesto' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
 ];
 const currentPath = Astro.url.pathname;
 ---
 <header class="border-b border-ink/10">
-  <div class="max-w-5xl mx-auto flex items-center justify-between px-6 py-5">
-    <a href="/" class="font-display font-extrabold text-xl sm:text-2xl text-ink lowercase tracking-tight">
+  <div class="max-w-5xl mx-auto flex items-center gap-4 px-6 py-5">
+    <a href="/" class="font-display font-extrabold text-xl sm:text-2xl text-ink lowercase tracking-tight shrink-0">
       dumb gtm
     </a>
-    <nav class="flex items-center gap-1 sm:gap-2">
+    <nav class="flex items-center gap-0.5 sm:gap-2 overflow-x-auto ml-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {navItems.map((item) => {
         const active = currentPath === item.href || (item.href !== '/' && currentPath.startsWith(item.href));
         return (
           <a
             href={item.href}
             class:list={[
-              'font-display text-sm px-3 py-2 rounded-md transition-colors',
+              'font-display text-sm px-2 sm:px-3 py-2 rounded-md transition-colors whitespace-nowrap shrink-0',
               active ? 'text-siren font-bold' : 'text-ink/70 hover:text-siren',
             ]}
           >
