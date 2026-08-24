@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroVisual from '../components/HeroVisual.astro';
 import { getCollection } from 'astro:content';
 
 const posts = (await getCollection('blog', ({ data }) => !data.draft))
@@ -23,18 +24,21 @@ const bits = [
 ---
 <BaseLayout title="Home">
   <section class="max-w-5xl mx-auto px-6 pt-16 pb-20">
-    <p class="tag mb-6">est. 2026 &middot; contrarian by design</p>
-    <h1 class="font-display font-extrabold text-4xl sm:text-6xl leading-[1.05] max-w-3xl text-ink">
-      Go-to-market advice for people tired of being lied to about go-to-market.
-    </h1>
-    <p class="mt-6 text-lg sm:text-xl max-w-2xl text-ink/80">
-      dumbGTM calls out the slop: the AI SDR spam, the "10x your pipeline" grifters, the
-      frameworks nobody needed. We keep the ideas dumb and obvious on purpose — because
-      that's usually what actually works.
-    </p>
-    <div class="mt-8 flex flex-wrap gap-3">
-      <a href="/blog" class="btn-solid">Read the blog</a>
-      <a href="/contact" class="btn">Book a session (soon)</a>
+    <div class="grid sm:grid-cols-2 gap-10 sm:gap-6 items-center">
+      <div>
+        <p class="tag mb-6">est. 2026 &middot; contrarian by design</p>
+        <h1 class="font-display font-extrabold text-4xl sm:text-6xl leading-[1.05] max-w-3xl text-ink">
+          Just calling out bad marketing.
+        </h1>
+        <p class="mt-6 text-lg sm:text-xl max-w-2xl text-ink/80">
+          You can trust us because we have nothing to sell you.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href="/blog" class="btn-solid">Read the blog</a>
+          <a href="/contact" class="btn">Book a session (soon)</a>
+        </div>
+      </div>
+      <HeroVisual />
     </div>
   </section>
 
@@ -79,7 +83,7 @@ const bits = [
       <div>
         <h2 class="font-display font-bold text-2xl mb-2 text-ink">Want an hour with someone who's actually done this?</h2>
         <p class="text-ink/70 max-w-xl">
-          We're building a way to book paid, hourly sessions with real GTM operators —
+          We're building a way to book paid, hourly sessions with real GTM operators &mdash;
           no retainers, no decks, just answers. Operator sign-ups and booking are coming soon.
         </p>
       </div>
