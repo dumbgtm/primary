@@ -14,71 +14,126 @@ npm run preview   # serve the production build locally
 
 ## Project structure
 
-- `src/content/blog/*.md` — blog posts. Add a new file here to add a new post (frontmatter:
--   `title`, `description`, `pubDate`, `tags`, optional `draft: true` to hide it).
--   - `src/pages/` — Home, About, Contact, Blog index + post template.
-    - - `src/components/` — Header, Footer.
-      - - `src/layouts/BaseLayout.astro` — shared shell, fonts, meta tags.
-        - - `src/styles/global.css` — Tailwind + brand utility classes (`.btn`, `.tag`, `.prose-dumb`).
-          - - `tailwind.config.mjs` — brand colors (`paper`, `ink`, `siren`, `frost`, `cerulean`, `slate`)
-            -   and fonts (`font-display`, `font-body`).
-            -   - `brand.md` — full brand guide: palette, type, voice, logo rationale.
-                - - `public/logo.svg`, `public/logo-stamp.svg` — wordmark and stamp/favicon mark.
-                 
-                  - ## Publishing a new post
-                 
-                  - Add a markdown file to `src/content/blog/`, e.g. `src/content/blog/my-new-post.md`:
-                 
-                  - ```md
-                    ---
-                    title: "Post title"
-                    description: "One-sentence hook for cards/SEO."
-                    pubDate: 2026-07-10
-                    tags: ["tag-one", "tag-two"]
-                    ---
+- `src/content/blog/*.md` — long-form posts. Add a new file here to add a new post
+  (frontmatter: `title`, `description`, `pubDate`, `tags`, optional `draft: true` to hide it).
+- `src/content/takes/*.md` — Hot Takes: short, single-idea contrarian one-liners (frontmatter:
+  `pubDate`, `tags`, optional `draft: true`; the take text itself is the markdown body).
+- `src/pages/` — Home, About, Contact, Manifesto, Blog index + post template, Takes index +
+  take template.
+- `src/components/` — Header, Footer, HeroVisual (animated hero illustration).
+- `src/layouts/BaseLayout.astro` — shared shell, fonts, meta tags, OG/Twitter card tags,
+  analytics.
+- `src/styles/global.css` — Tailwind + brand utility classes (`.btn`, `.tag`, `.prose-dumb`).
+- `tailwind.config.mjs` — brand colors (`paper`, `ink`, `siren`, `frost`, `cerulean`, `slate`)
+  and fonts (`font-display`, `font-body`).
+- `brand.md` — full brand guide: palette, type, voice, logo rationale.
+- `public/logo.svg`, `public/logo-stamp.svg` — wordmark and stamp/favicon mark.
+- `public/og/` — branded 1200x630 social share images (see "Generating OG share images" below).
+- `scripts/og-template.html` — reusable template used to generate those images.
 
-                    Body in markdown.
-                    ```
+## Publishing a new post
 
-                    Push to the connected branch and Cloudflare rebuilds and redeploys automatically (once
-                    Workers Builds is connected — see below).
+Add a markdown file to `src/content/blog/`, e.g. `src/content/blog/my-new-post.md`:
 
-                    ## Pushing to GitHub
+```md
+---
+title: "Post title"
+description: "One-sentence hook for cards/SEO."
+pubDate: 2026-07-10
+tags: ["tag-one", "tag-two"]
+---
 
-                    This project is already pushed here. If you ever need to push from a fresh local clone,
-                    standard git commands apply (`git remote add origin ...`, `git push -u origin main`).
+Body in markdown.
+```
 
-                    ## Deploying on Cloudflare (Workers, not Pages — Cloudflare's current recommendation)
+Then generate an OG image for it (see below) at `public/og/blog/my-new-post.png`.
 
-                    Cloudflare has moved static-site hosting from "Pages" to "Workers with static assets" +
-                    "Workers Builds" for git integration (Pages still works but isn't the path Cloudflare is
-                    investing in for new projects, and it's what the connected Cloudflare account tooling
-                    expects). Functionally it's the same idea: connect a repo, auto-build on push, free static
-                    hosting.
+## Publishing a new Hot Take
 
-                    1. In the Cloudflare dashboard: **Workers & Pages → Create → Import a Git repository**,
-                    2.    authorize GitHub if prompted, and select the `dumbgtm/primary` repo.
-                    3.2. Cloudflare should auto-detect Astro. Confirm:
-                         - Build command: `npm run build`
-                         - Deploy/output directory: `dist`
-                      3. Deploy. You'll get a live `*.workers.dev` URL immediately.
-                      4. 4. **Custom domain:** in the Worker's **Settings → Domains & Routes → Add**, enter
-                         5.    `dumbgtm.com` (and `www.dumbgtm.com`). Since the domain's already in the same Cloudflare
-                         6.   account, this is a few clicks with no manual DNS editing.
-                         7.   5. Every push to `main` rebuilds and redeploys automatically from then on.
-                           
-                              6. ## Before real launch — still open
-                           
-                              7. - **Contact form**: currently points at a placeholder Formspree endpoint in `src/pages/contact.astro`
-                                 -   (`action="https://formspree.io/f/YOUR_FORM_ID"`). Create a free form at formspree.io and swap in
-                                 -     the real endpoint, or replace with a Cloudflare Pages Function if you'd rather keep it in-house.
-                                 - - **hello@dumbgtm.com**: referenced on the Contact page. Set up email routing for the domain in
-                                   -   Cloudflare (Email → Email Routing) to forward it to your real inbox.
-                                   -   - **Operator sign-up + booking**: out of scope for this pass. When ready, this will likely need:
-                                       -   a database (Cloudflare D1 works well with Astro on Workers), auth for operators, and a booking/
-                                       -     payment flow (e.g. Stripe Checkout + Calendly-style scheduling, or a custom booking table).
-                                       - - **Analytics**: none wired up yet. Cloudflare Web Analytics is free and privacy-friendly if you
-                                         -   want basic traffic numbers without a cookie banner.
-                                         -   - **OG image**: pages currently only set text OG tags. Consider a simple branded 1200x630 image
-                                             -   for link previews before sharing posts on social.
-                                             -   
+Add a markdown file to `src/content/takes/`, e.g. `src/content/takes/my-new-take.md`:
+
+```md
+---
+pubDate: 2026-08-25
+tags: ["tag-one"]
+---
+
+The take itself, one to three sentences, goes here as the body.
+```
+
+Then generate an OG image for it (see below) at `public/og/takes/my-new-take.png`.
+
+Push to the connected branch and Cloudflare rebuilds and redeploys automatically (once
+Workers Builds is connected — see below).
+
+## Generating OG share images
+
+Every page has a branded 1200x630 image for link previews (`og:image`/`twitter:image`),
+sourced from `scripts/og-template.html`. It's a static HTML template that takes `kicker`
+(e.g. `HOT TAKE`, `BLOG POST`, `MANIFESTO`) and `text` (the headline/quote) as URL query
+params. To generate a new one:
+
+1. Serve the `website/` folder locally (e.g. `python3 -m http.server 8935` from that
+   directory) so the template can load its Google Font.
+2. Open `http://localhost:8935/scripts/og-template.html?kicker=HOT+TAKE&text=Your+text+here`
+   in a browser sized to exactly 1200x630, or screenshot it with headless Chrome:
+   ```
+   /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
+     --headless --disable-gpu --hide-scrollbars --window-size=1200,630 \
+     --screenshot=public/og/takes/my-new-take.png \
+     "http://localhost:8935/scripts/og-template.html?kicker=HOT+TAKE&text=Your+text+here"
+   ```
+3. Reference it via the page's `ogImage` prop on `<BaseLayout>` (blog and takes pages do
+   this automatically from the slug; other pages set it explicitly, e.g. `manifesto.astro`).
+
+This is a manual step for now rather than a build-time step, since it avoids adding an
+image-rendering dependency (satori/resvg, etc.) to the build — worth automating later if
+publishing volume goes up.
+
+## Pushing to GitHub
+
+A git repo has already been initialized here with one commit. To get it onto GitHub:
+
+1. Create a new **empty** repo at [github.com/new](https://github.com/new) (don't add a
+   README/.gitignore/license — this project already has them). Name suggestion: `dumbgtm`.
+2. In a terminal, `cd` into this folder and run:
+   ```
+   git remote add origin https://github.com/YOUR_USERNAME/dumbgtm.git
+   git push -u origin main
+   ```
+   (GitHub will prompt you to sign in the first time — that happens in your own browser/
+   credential manager, nothing to configure here.)
+
+## Deploying on Cloudflare (Workers, not Pages — Cloudflare's current recommendation)
+
+Cloudflare has moved static-site hosting from "Pages" to "Workers with static assets" +
+"Workers Builds" for git integration (Pages still works but isn't the path Cloudflare is
+investing in for new projects, and it's what the connected Cloudflare account tooling
+expects). Functionally it's the same idea: connect a repo, auto-build on push, free static
+hosting.
+
+1. Push the repo to GitHub (above) first.
+2. In the Cloudflare dashboard: **Workers & Pages → Create → Import a Git repository**,
+   authorize GitHub if prompted, and select the `dumbgtm` repo.
+3. Cloudflare should auto-detect Astro. Confirm:
+   - Build command: `npm run build`
+   - Deploy/output directory: `dist`
+4. Deploy. You'll get a live `*.workers.dev` URL immediately.
+5. **Custom domain:** in the Worker's **Settings → Domains & Routes → Add**, enter
+   `dumbgtm.com` (and `www.dumbgtm.com`). Since the domain's already in the same Cloudflare
+   account, this is a few clicks with no manual DNS editing.
+6. Every push to `main` rebuilds and redeploys automatically from then on.
+
+## Before real launch — still open
+
+- **Contact form**: currently points at a placeholder Formspree endpoint in `src/pages/contact.astro`
+  (`action="https://formspree.io/f/YOUR_FORM_ID"`). Create a free form at formspree.io and swap in
+  the real endpoint, or replace with a Cloudflare Pages Function if you'd rather keep it in-house.
+- **hello@dumbgtm.com / contact@dumbgtm.com**: Cloudflare Email Routing is live, forwarding
+  both to the account owner's inbox.
+- **Operator sign-up + booking**: out of scope for this pass. When ready, this will likely need:
+  a database (Cloudflare D1 works well with Astro on Workers), auth for operators, and a booking/
+  payment flow (e.g. Stripe Checkout + Calendly-style scheduling, or a custom booking table).
+- **Analytics**: GA4 is live in `src/layouts/BaseLayout.astro`. Cloudflare Web Analytics is wired
+  but still disabled — swap in a real `CF_ANALYTICS_TOKEN` (from Cloudflare Analytics & Logs →
+  Web Analytics → Manage site) near the top of that file when ready.
