@@ -1,6 +1,8 @@
 ---
+// Outline tag with a 12px stage mark: [• §4 BORING]
+import Icon from './Icon.astro';
 import { STAGES, type Stage } from '../lib/site';
 interface Props { stage: Stage }
 const s = STAGES[Astro.props.stage];
 ---
-<span class="tag">§{s.n} {s.label}</span>
+<span class="tag inline-flex items-center gap-[6px]"><Icon name={s.mark} size={12} />§{s.n} {s.label}</span>

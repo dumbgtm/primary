@@ -17,14 +17,15 @@ npm run preview   # serve the production build locally
 - `src/content/blog/*.md` — long-form posts. Add a new file here to add a new post
   (frontmatter: `title`, `description`, `pubDate`, `tags`, optional `draft: true` to hide it).
 - `src/pages/` — Home, About, Contact, Blog index + post template.
-- `src/components/` — Header, Footer, MemoHeader, MemoList, SignatureBlock, StageBadge, SocialButton, LoopVisual (Fig. 1, the dumb idea loop).
+- `src/components/` — Header, Footer, MemoHeader, MemoList, SignatureBlock, StageBadge, SocialButton, Icon,
+  Stamp, PaperclipCard, HolePunch, Fig1 (the dumb idea loop). Icons live in `src/lib/icons.ts`.
 - `src/layouts/BaseLayout.astro` — shared shell, fonts, meta tags, OG/Twitter card tags,
   analytics.
 - `src/styles/global.css` — Tailwind + brand tokens and utility classes (`.btn-primary`, `.tag`, `.prose-memo`, ...).
 - `tailwind.config.mjs` — brand colors (`memo`, `carbon`, `ink`, `ink2`, `muted`, `staple`, `rule`, `blue`,
   `highlighter`), fonts (`font-serif` Libre Caslon Text, `font-mono` Space Mono), square corners.
 - `brand.md` — full brand guide: palette, type, voice, logo rationale.
-- `public/logo.svg`, `public/logo-stamp.svg` — wordmark and stamp/favicon mark.
+- `public/logo.svg` — wordmark. `public/favicon.svg` (+ PNGs) — memo-sheet favicon.
 - `public/og/` — branded 1200x630 social share images (see "Generating OG share images" below).
 - `scripts/og-template.html` — reusable template used to generate those images.
 
@@ -51,19 +52,19 @@ Workers Builds is connected — see below).
 ## Generating OG share images
 
 Every page has a branded 1200x630 image for link previews (`og:image`/`twitter:image`),
-sourced from `scripts/og-template.html`. It's a static HTML template that takes `kicker`
-(e.g. `BLOG POST`) and `text` (the headline/quote) as URL query
-params. To generate a new one:
+sourced from `scripts/og-template.html` (Graphics Kit §06). It's a static HTML template driven by
+URL query params: `mode` (`default` or `memo`), `memo` (number), `stage` (1-4), `title`, `italic`
+(the punchline part of the title) and `date`. To generate a new one:
 
 1. Serve the `website/` folder locally (e.g. `python3 -m http.server 8935` from that
    directory) so the template can load its Google Font.
-2. Open `http://localhost:8935/scripts/og-template.html?kicker=BLOG+POST&text=Your+text+here`
+2. Open `http://localhost:8935/scripts/og-template.html?mode=memo&memo=004&stage=1&date=Oct+4,+2026&title=Your+title&italic=title`
    in a browser sized to exactly 1200x630, or screenshot it with headless Chrome:
    ```
    /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
      --headless --disable-gpu --hide-scrollbars --window-size=1200,630 \
      --screenshot=public/og/blog/my-new-post.png \
-     "http://localhost:8935/scripts/og-template.html?kicker=BLOG+POST&text=Your+text+here"
+     "http://localhost:8935/scripts/og-template.html?mode=memo&memo=004&stage=1&date=Oct+4,+2026&title=Your+title&italic=title"
    ```
 3. Reference it via the page's `ogImage` prop on `<BaseLayout>` (blog posts do
    this automatically from the slug; other pages set it explicitly).

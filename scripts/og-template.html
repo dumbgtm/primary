@@ -3,50 +3,68 @@
 <head>
 <meta charset="UTF-8" />
 <title>OG template</title>
-<!-- dumbGTM "HR Memo" share card, 1200x630. Params: kicker (RE line), text (headline). -->
+<!--
+  dumbGTM share cards, 1200x630 (Graphics Kit §06).
+  ?mode=default                                        -> og/default.png (APPROVED stamp)
+  ?mode=memo&memo=003&stage=4&title=...&italic=...&date=Sep+6,+2026
+                                                       -> og/blog/<slug>.png (FILED stamp)
+  `italic` is the punchline part of the title, set in italics.
+-->
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Space+Mono:wght@400;700&display=swap');
-  :root { --memo:#FBFAF6; --ink:#141414; --ink-2:#3D3D39; --muted:#5C5C56; --rule:#DAD8D0; --highlighter:#F5EE6A; }
+  :root { --memo:#FBFAF6; --ink:#141414; --ink-2:#3D3D39; --muted:#5C5C56; --highlighter:#F5EE6A; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { width: 1200px; height: 630px; background: var(--memo); overflow: hidden; }
-  .canvas { width: 1200px; height: 630px; padding: 64px 80px 56px; display: flex; flex-direction: column; }
-  .top { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid var(--ink); padding-bottom: 16px; }
-  .wordmark { font-family: 'Libre Caslon Text', serif; font-weight: 700; font-size: 32px; color: var(--ink); }
-  .stamp { font-family: 'Space Mono', monospace; font-size: 16px; letter-spacing: .06em; text-transform: uppercase; background: var(--ink); color: var(--memo); padding: 6px 14px; }
-  .memo { display: grid; grid-template-columns: 110px 1fr; row-gap: 6px; font-family: 'Space Mono', monospace; font-size: 20px; color: var(--muted); margin-top: 36px; }
-  .memo .re { color: var(--ink); }
-  .headline { font-family: 'Libre Caslon Text', serif; font-size: 60px; line-height: 1.1; color: var(--ink); margin-top: 32px; max-width: 1040px; }
-  .headline.long { font-size: 46px; }
-  .headline.short { font-size: 76px; }
-  .bottom { margin-top: auto; border-top: 1px solid var(--ink); padding-top: 3px; }
-  .bottom::before { content: ''; display: block; border-top: 1px solid var(--ink); }
-  .foot { display: flex; justify-content: space-between; font-family: 'Space Mono', monospace; font-size: 18px; color: var(--muted); padding-top: 14px; }
+  html, body { width: 1200px; height: 630px; background: var(--memo); overflow: hidden; color: var(--ink); }
+  .canvas { position: relative; width: 1200px; height: 630px; padding: 64px 72px; display: flex; flex-direction: column; }
+  .head { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--ink); padding-bottom: 20px; }
+  .logo { font-family: 'Libre Caslon Text', serif; font-weight: 700; font-size: 36px; line-height: 1; }
+  .right { display: flex; align-items: center; gap: 20px; font-family: 'Space Mono', monospace; font-size: 22px; text-transform: uppercase; letter-spacing: .06em; }
+  .stage-tag { display: inline-flex; align-items: center; gap: 10px; border: 2px solid var(--ink); padding: 6px 14px; font-size: 18px; }
+  .memo-head { display: grid; grid-template-columns: 120px 1fr; row-gap: 8px; font-family: 'Space Mono', monospace; font-size: 24px; color: var(--muted); margin-top: 36px; }
+  .memo-head .re { color: var(--ink); }
+  .display { font-family: 'Libre Caslon Text', serif; font-size: 104px; line-height: 1.02; margin-top: 32px; }
+  .display mark { background: var(--highlighter); color: var(--ink); padding: 0 8px; }
+  .title { font-family: 'Libre Caslon Text', serif; font-size: 72px; line-height: 1.08; max-width: 1000px; margin-top: 44px;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .title.long { font-size: 60px; }
+  .foot { margin-top: auto; font-family: 'Space Mono', monospace; font-size: 22px; color: var(--muted); }
+  .stamp { position: absolute; right: 72px; bottom: 56px; border: 4px solid var(--ink); padding: 5px; opacity: .85; mix-blend-mode: multiply; }
+  .stamp span { display: block; border: 2px solid var(--ink); padding: 10px 24px; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 30px; letter-spacing: .12em; text-transform: uppercase; line-height: 1; }
 </style>
 </head>
 <body>
-<div class="canvas">
-  <div class="top">
-    <div class="wordmark">dumbgtm</div>
-    <div class="stamp">Internal memo</div>
-  </div>
-  <div class="memo">
-    <div>TO:</div><div>All Sales, Marketing &amp; Whoever</div>
-    <div>RE:</div><div class="re" id="kicker">Blog post</div>
-  </div>
-  <div class="headline" id="headline">Placeholder headline text goes here.</div>
-  <div class="bottom">
-    <div class="foot"><span>dumbgtm.com</span><span>Celebrating dumb marketing ideas.</span></div>
-  </div>
-</div>
+<div class="canvas" id="c"></div>
 <script>
-  const params = new URLSearchParams(window.location.search);
-  const kicker = params.get('kicker') || 'Blog post';
-  const text = params.get('text') || 'Placeholder headline text goes here.';
-  document.getElementById('kicker').textContent = kicker;
-  const h = document.getElementById('headline');
-  h.textContent = text;
-  if (text.length > 90) h.classList.add('long');
-  else if (text.length < 40) h.classList.add('short');
+  const q = new URLSearchParams(location.search);
+  const esc = (s) => s.replace(/[&<>"]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[m]);
+  const MARKS = {
+    1: '<circle cx="12" cy="12" r="3"/>',
+    2: '<path d="M4 18l6-6 4 3 6-9"/><path d="M15 6h5v5"/>',
+    3: [6, 12, 18].flatMap((y) => [6, 12, 18].map((x) => `<circle cx="${x}" cy="${y}" r="1.5"/>`)).join(''),
+    4: '<path d="M4 10h16M4 14h16"/>',
+  };
+  const NAMES = { 1: 'Dumb', 2: 'Working', 3: 'Everywhere', 4: 'Boring' };
+  const mark = (n) => `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square">${MARKS[n]}</svg>`;
+  const c = document.getElementById('c');
+  if (q.get('mode') === 'memo') {
+    const n = q.get('stage');
+    const title = q.get('title') || 'Untitled memo';
+    const it = q.get('italic') || '';
+    const i = it ? title.lastIndexOf(it) : -1;
+    const html = i >= 0 ? esc(title.slice(0, i)) + '<em>' + esc(it) + '</em>' + esc(title.slice(i + it.length)) : esc(title);
+    c.innerHTML = `
+      <div class="head"><div class="logo">dumbgtm</div>
+        <div class="right"><span>Memo ${esc(q.get('memo') || '001')}</span>${n ? `<span class="stage-tag">${mark(n)}§${n} ${NAMES[n]}</span>` : ''}</div></div>
+      <div class="title ${title.length > 90 ? 'long' : ''}">${html}</div>
+      <div class="foot">${esc(q.get('date') || '')} · dumbgtm.com/blog</div>
+      <div class="stamp" style="transform: rotate(4deg)"><span>Filed</span></div>`;
+  } else {
+    c.innerHTML = `
+      <div class="head"><div class="logo">dumbgtm</div><div class="right">dumbgtm.com</div></div>
+      <div class="memo-head"><div>TO:</div><div>All Sales, Marketing &amp; Whoever</div><div>RE:</div><div class="re">silly. goofy. dense. fun.</div></div>
+      <div class="display">So <mark>dumb</mark> it <em>might work.</em></div>
+      <div class="stamp" style="transform: rotate(-5deg)"><span>Approved</span></div>`;
+  }
 </script>
 </body>
 </html>

@@ -1,0 +1,29 @@
+---
+// Three-hole punch gutter (Graphics Kit §04.3) for long-form pages, desktop only.
+---
+<div class="punched">
+  <div class="punch-gutter" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="punch-body"><slot /></div>
+</div>
+
+<style>
+  .punched { display: block; }
+  .punch-gutter { display: none; }
+  @media (min-width: 900px) {
+    .punched { display: grid; grid-template-columns: 36px 1fr; column-gap: 32px; }
+    .punch-gutter {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      align-items: center;
+      border-right: 1px solid var(--rule);
+      min-height: 100%;
+    }
+    .punch-gutter span {
+      width: 12px; height: 12px;
+      border-radius: 9999px;
+      background: var(--carbon);
+      box-shadow: inset 0 0 0 1px var(--ink);
+    }
+  }
+</style>

@@ -1,16 +1,23 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import LoopVisual from '../components/LoopVisual.astro';
+import Fig1 from '../components/Fig1.astro';
+import Icon from '../components/Icon.astro';
 import MemoHeader from '../components/MemoHeader.astro';
 import MemoList from '../components/MemoList.astro';
+import PaperclipCard from '../components/PaperclipCard.astro';
 import SignatureBlock from '../components/SignatureBlock.astro';
 import SocialButton from '../components/SocialButton.astro';
+import StageBadge from '../components/StageBadge.astro';
+import Stamp from '../components/Stamp.astro';
 import { getCollection } from 'astro:content';
-import { STAGES, STAGE_KEYS, YOUTUBE_URL, LINKEDIN_URL } from '../lib/site';
+import { STAGES, STAGE_KEYS, YOUTUBE_URL, LINKEDIN_URL, readTime } from '../lib/site';
 
 const all = (await getCollection('blog', ({ data }) => !data.draft))
   .sort((a, b) => a.data.pubDate.valueOf() - b.data.pubDate.valueOf());
-const posts = all.map((p, i) => ({ post: p, n: i + 1 })).reverse().slice(0, 3);
+const numbered = all.map((p, i) => ({ post: p, n: i + 1 })).reverse();
+const featured = numbered[0];
+const rest = numbered.slice(1, 3);
+const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 
 const stageCopy = {
   dumb: 'Someone suggests something contrarian. Nobody smart is doing anything like it. Maybe not your best idea, try again.',
@@ -20,16 +27,17 @@ const stageCopy = {
 };
 
 const bits = [
-  { title: 'Early', body: "We write about ideas while they still sound dumb. That's the only stage where they give you an edge." },
-  { title: 'Honest', body: "Not all dumb ideas work (obviously). When a tactic is so bad it's not worth trying, that's worth calling out too. But feel free to ignore our take." },
-  { title: 'Real', body: "We'll cover stories from main character GTM leaders who tried dumb things." },
-];
+  { icon: 'clock', title: 'Early', body: "We write about ideas while they still sound dumb. That's the only stage where they give you an edge." },
+  { icon: 'x-box', title: 'Honest', body: "Not all dumb ideas work (obviously). When a tactic is so bad it's not worth trying, that's worth calling out too. But feel free to ignore our take." },
+  { icon: 'megaphone', title: 'Real', body: "We'll cover stories from main character GTM leaders who tried dumb things." },
+] as const;
+const hasSocial = Boolean(YOUTUBE_URL || LINKEDIN_URL);
 ---
 <BaseLayout title="Home" description="DumbGTM celebrates the marketing ideas that get laughed at, and the people behind them.">
   <!-- Hero -->
   <section class="container-memo pt-12 sm:pt-16 pb-16 sm:pb-24">
-    <div class="grid md:grid-cols-[1.15fr_1fr] gap-12 md:gap-10 items-start">
-      <div class="flex flex-col gap-7">
+    <div class="grid md:grid-cols-[1fr_auto] gap-10 md:gap-12 items-end">
+      <div class="flex flex-col gap-7 max-w-[760px]">
         <MemoHeader rows={[
           { label: 'TO:', value: 'All Sales, Marketing & Whoever' },
           { label: 'FROM:', value: 'dumbGTM' },
@@ -40,16 +48,22 @@ const bits = [
           DumbGTM celebrates the marketing ideas that get laughed at, and the people behind them.
         </p>
         <div class="flex flex-wrap gap-3">
-          <a href="/blog" class="btn-primary">Read the blog →</a>
-          <SocialButton href={YOUTUBE_URL} label="Watch on YouTube" />
+          <a href="/blog" class="btn-primary">Read the blog<Icon name="arrow-right" size={16} /></a>
+          <SocialButton href={YOUTUBE_URL} label="Watch on YouTube" icon="video" />
         </div>
-        <SignatureBlock name="The Author" subtitle="Name withheld. Feelings: on file." class="self-end" />
       </div>
-      <LoopVisual />
+      <div class="relative justify-self-end pt-10 pr-4">
+        <SignatureBlock />
+        <Stamp text="Dumb" italic over="Certified" sub="§1 of 4" rotate={-6} class="absolute -top-8 right-[-8px]" />
+      </div>
+    </div>
+
+    <div class="mt-16 sm:mt-20">
+      <Fig1 />
     </div>
   </section>
 
-  <!-- The loop -->
+  <!-- Section 1: the loop -->
   <section class="container-memo pb-16 sm:pb-24">
     <div class="border-t border-ink pt-10">
       <p class="t-label text-muted mb-3">Section 1</p>
@@ -57,22 +71,25 @@ const bits = [
       <p class="t-body-mono max-w-[60ch] mb-10">
         Most marketing "gamechangers" go through the same four stages. Then someone comes up with a new dumb idea and it starts over.
       </p>
-      <ol class="grid sm:grid-cols-2 lg:grid-cols-4 border-t border-l border-ink">
+      <ol class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {STAGE_KEYS.map((key) => (
-          <li class="border-r border-b border-ink p-5 sm:p-6">
+          <li class:list={['border border-ink p-5 sm:p-6 bg-memo', key === 'everywhere' && 'carbon-copy']}>
+            <Icon name={STAGES[key].mark} size={48} class="text-ink mb-4" />
             <p class="t-label text-muted mb-3">§{STAGES[key].n} of 4</p>
             <h3 class="t-h3 text-ink mb-3">{STAGES[key].label}</h3>
             <p class="t-body-mono text-[13px]">{stageCopy[key]}</p>
           </li>
         ))}
       </ol>
-      <p class="font-serif italic text-[19px] leading-[1.5] text-ink2 mt-8 max-w-[56ch]">
-        Somewhere, right now, in an open-concept office with many plants and cold brew on tap, a dumb idea is being ignored.
-      </p>
+      <blockquote class="ruled border border-ink mt-12 max-w-[640px] py-[14px] pr-6">
+        <p class="font-serif italic text-[19px] text-ink">
+          Somewhere, right now, in an open-concept office with many plants and cold brew on tap, a dumb idea is being ignored.
+        </p>
+      </blockquote>
     </div>
   </section>
 
-  <!-- What you'll find here -->
+  <!-- Section 2: what you'll find here -->
   <section class="bg-ink text-memo">
     <div class="container-memo py-16 sm:py-24">
       <p class="t-label text-staple mb-3">Section 2</p>
@@ -80,7 +97,10 @@ const bits = [
       <div class="grid sm:grid-cols-3 gap-10 sm:gap-8">
         {bits.map((bit, i) => (
           <div class="border-t border-memo/40 pt-5">
-            <p class="t-label text-staple mb-2">2.{i + 1}</p>
+            <div class="flex items-center justify-between mb-4">
+              <p class="t-label text-staple">2.{i + 1}</p>
+              <Icon name={bit.icon} size={24} class="text-memo" />
+            </div>
             <h3 class="font-serif font-bold text-[22px] leading-[1.25] mb-2">{bit.title}</h3>
             <p class="font-mono text-[14px] leading-[1.6] text-memo/80">{bit.body}</p>
           </div>
@@ -89,34 +109,68 @@ const bits = [
     </div>
   </section>
 
-  <!-- New stuff -->
-  <section class="container-memo py-16 sm:py-24">
-    <div class="flex items-baseline justify-between gap-4 mb-6">
-      <div>
-        <p class="t-label text-muted mb-3">Section 3</p>
-        <h2 class="t-h1 text-ink">New stuff</h2>
+  <!-- Section 3: new stuff (carbon band) -->
+  <section class="bg-carbon border-b border-ink">
+    <div class="container-memo py-16 sm:py-24">
+      <div class="flex items-baseline justify-between gap-4 mb-10">
+        <div>
+          <p class="t-label text-muted mb-3 inline-flex items-center gap-2"><Icon name="inbox" size={16} />Section 3: In tray</p>
+          <h2 class="t-h1 text-ink">New stuff</h2>
+        </div>
+        <a href="/blog" class="link t-label inline-flex items-center gap-[6px] whitespace-nowrap">All posts<Icon name="arrow-right" size={16} /></a>
       </div>
-      <a href="/blog" class="link t-label">All posts →</a>
+
+      {!featured ? (
+        <p class="t-small">Nothing here yet. Someone is still being laughed at in a meeting.</p>
+      ) : (
+        <div class="grid lg:grid-cols-[1.1fr_1fr] gap-10 lg:gap-12 items-start">
+          <PaperclipCard label={`Attachment A · Memo ${String(featured.n).padStart(3, '0')}`} class="mt-5">
+            <a href={`/blog/${featured.post.slug}`} class="featured-link block">
+              <div class="flex flex-wrap items-center gap-2 mb-4">
+                <span class="tag-highlighter">New</span>
+                {featured.post.data.stage && <StageBadge stage={featured.post.data.stage} />}
+              </div>
+              <h3 class="font-serif text-[30px] sm:text-[34px] leading-[1.12] text-ink mb-4">{featured.post.data.title}</h3>
+              <p class="t-body-mono mb-6">RE: {featured.post.data.description}</p>
+              <div class="flex flex-wrap items-center justify-between gap-4 border-t border-rule pt-4">
+                <span class="t-small inline-flex items-center gap-[6px]"><Icon name="clock" size={12} />{fmt(featured.post.data.pubDate)} · {readTime(featured.post.body)} min read</span>
+                <span class="link t-label inline-flex items-center gap-[6px]">Read memo<Icon name="arrow-right" size={16} /></span>
+              </div>
+            </a>
+          </PaperclipCard>
+          <div>
+            <p class="t-label text-muted mb-3">Also in the tray</p>
+            <MemoList items={rest} compact />
+          </div>
+        </div>
+      )}
     </div>
-    {posts.length === 0 ? (
-      <p class="t-small">Nothing here yet. Someone is still being laughed at in a meeting.</p>
-    ) : (
-      <MemoList items={posts} />
-    )}
   </section>
 
-  <!-- Video -->
-  <section class="container-memo pb-8">
-    <div class="border border-ink p-6 sm:p-10 grid sm:grid-cols-[1fr_auto] gap-6 items-center">
+  <!-- Section 4: video (highlighter panel) -->
+  <section class="container-memo py-16 sm:py-24">
+    <div class="bg-highlighter border border-ink p-6 sm:p-10 grid md:grid-cols-[auto_1fr_auto] gap-6 md:gap-10 items-center">
+      <Icon name="video" size={48} class="text-ink" />
       <div>
-        <p class="t-label text-muted mb-3">Section 4</p>
+        <p class="t-label text-ink mb-3">Section 4: Audio-visual department</p>
         <h2 class="t-h2 text-ink mb-2">Dumb ideas, also in video form</h2>
-        <p class="t-body-mono">New breakdowns every week on YouTube, and shorter ones on LinkedIn.</p>
+        <p class="font-mono text-[14px] leading-[1.6] text-ink">New breakdowns every week on YouTube, and shorter ones on LinkedIn.</p>
       </div>
-      <div class="flex flex-wrap gap-3">
-        <SocialButton href={YOUTUBE_URL} label="YouTube" primary />
-        <SocialButton href={LINKEDIN_URL} label="LinkedIn" />
+      <div class="relative pt-10 md:pt-12">
+        {!hasSocial && (
+          <Stamp text="Pending approval" sub="Do not click (yet)" size={13} rotate={-4} solid class="absolute right-[-12px] sm:right-[-48px] top-[-6px] md:top-[-2px] z-10" />
+        )}
+        <div class="flex flex-wrap gap-3">
+          <SocialButton href={YOUTUBE_URL} label="YouTube" icon="video" />
+          <SocialButton href={LINKEDIN_URL} label="LinkedIn" icon="arrow-up-right" />
+        </div>
       </div>
     </div>
   </section>
 </BaseLayout>
+
+<style>
+  .featured-link:hover h3 { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+  /* Disabled buttons on the highlighter panel sit on memo so they read as paper. */
+  section :global(.bg-highlighter .btn-disabled) { background: var(--memo); }
+</style>

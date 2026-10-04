@@ -1,8 +1,12 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import HolePunch from '../../components/HolePunch.astro';
+import Icon from '../../components/Icon.astro';
 import MemoHeader from '../../components/MemoHeader.astro';
-import { STAGES } from '../../lib/site';
+import StageBadge from '../../components/StageBadge.astro';
+import Stamp from '../../components/Stamp.astro';
+import { STAGES, readTime } from '../../lib/site';
 
 export async function getStaticPaths() {
   const posts = (await getCollection('blog', ({ data }) => !data.draft))
@@ -27,22 +31,29 @@ const rows = [
 ---
 <BaseLayout title={post.data.title} description={post.data.description} ogImage={`/og/blog/${post.slug}.png`}>
   <article class="container-memo pt-12 sm:pt-16">
-    <a href="/blog" class="link t-label">← All posts</a>
-    <div class="max-w-[68ch] mt-8 flex flex-col gap-7">
-      <MemoHeader rows={rows} bordered />
-      <h1 class="t-h1 text-ink">{post.data.title}</h1>
-      {post.data.tags.length > 0 && (
-        <div class="flex gap-2 flex-wrap">
-          {post.data.tags.map((tag) => <span class="tag">{tag}</span>)}
+    <a href="/blog" class="link t-label inline-flex items-center gap-[6px]"><Icon name="arrow-right" size={16} class="rotate-180" />All posts</a>
+    <div class="mt-8">
+      <HolePunch>
+        <div class="max-w-[68ch] flex flex-col gap-7">
+          <MemoHeader rows={rows} bordered />
+          <h1 class="t-h1 text-ink">{post.data.title}</h1>
+          <div class="flex gap-2 flex-wrap items-center">
+            {post.data.stage && <StageBadge stage={post.data.stage} />}
+            {post.data.tags.map((tag) => <span class="tag">{tag}</span>)}
+            <span class="t-small inline-flex items-center gap-[6px] ml-1"><Icon name="clock" size={12} />{readTime(post.body)} min read</span>
+          </div>
         </div>
-      )}
-    </div>
-    <div class="prose-memo mt-10">
-      <Content />
-    </div>
-    <div class="max-w-[68ch] mt-12">
-      <div class="double-rule"></div>
-      <p class="t-small pt-4">End of memo. Please do not reply-all.</p>
+        <div class="prose-memo mt-10">
+          <Content />
+        </div>
+        <div class="max-w-[68ch] mt-12 pb-4">
+          <div class="double-rule"></div>
+          <div class="flex flex-wrap items-center justify-between gap-6 pt-6">
+            <p class="t-small">End of memo. Please do not reply-all.</p>
+            <Stamp text="Filed" rotate={4} class="mr-2" />
+          </div>
+        </div>
+      </HolePunch>
     </div>
   </article>
 </BaseLayout>

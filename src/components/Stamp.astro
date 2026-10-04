@@ -1,0 +1,80 @@
+---
+// Rubber stamp (Graphics Kit §03). Real text, double border, fixed rotation.
+// One stamp per view. Ink by default; blue only when the stamp is a link.
+interface Props {
+  text: string;          // main word, e.g. "FILED"
+  rotate?: number;       // -6 to 4 degrees, fixed per placement
+  sub?: string;          // 9px line below the main word
+  over?: string;         // 9px line above the main word
+  italic?: boolean;      // center word in Caslon 700 italic 22px (e.g. "Dumb")
+  inverse?: boolean;     // CONFIDENTIAL style
+  href?: string;         // makes it a blue link
+  size?: number;         // main text size, default 18
+  solid?: boolean;       // memo background, full opacity, no blending
+  decorative?: boolean;  // aria-hidden
+  class?: string;
+  style?: string;
+}
+const {
+  text, rotate = -3, sub, over, italic = false, inverse = false, href,
+  size = 18, solid = false, decorative = true, class: extra = '', style = '',
+} = Astro.props;
+const Tag = href ? 'a' : 'span';
+---
+<Tag
+  href={href}
+  class:list={['stamp', href && 'stamp-link', solid && 'stamp-solid', inverse && 'stamp-inverse', extra]}
+  style={`transform: rotate(${rotate}deg); ${style}`}
+  aria-hidden={decorative && !href ? 'true' : undefined}
+>
+  <span class="stamp-inner">
+    {over && <span class="stamp-sub">{over}</span>}
+    {italic
+      ? <span class="stamp-word-italic">{text}</span>
+      : <span class="stamp-word" style={`font-size:${size}px`}>{text}</span>}
+    {sub && <span class="stamp-sub">{sub}</span>}
+  </span>
+</Tag>
+
+<style>
+  .stamp {
+    display: inline-block;
+    border: 2px solid currentColor;
+    padding: 3px;
+    color: var(--ink);
+    opacity: 0.85;
+    mix-blend-mode: multiply;
+    white-space: nowrap;
+    line-height: 1;
+  }
+  .stamp-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid currentColor;
+    padding: 6px 14px;
+  }
+  .stamp-word {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+  .stamp-word-italic {
+    font-family: 'Libre Caslon Text', serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 22px;
+  }
+  .stamp-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+  .stamp-inverse .stamp-inner { background: var(--ink); color: var(--memo); border-color: var(--ink); }
+  .stamp-link { color: var(--blue); }
+  .stamp-link:hover { color: var(--blue-hover); }
+  .stamp-solid { background: var(--memo); opacity: 1; mix-blend-mode: normal; }
+</style>

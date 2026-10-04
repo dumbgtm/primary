@@ -1,0 +1,127 @@
+---
+// Fig. 1: the dumb idea loop (Graphics Kit §05). HTML/CSS flowchart.
+// §1 is highlighted ("you are here"); optional motion steps the highlight
+// §1→§4 every 2.4s, then holds on §1 for an extra second.
+import Icon from './Icon.astro';
+import { STAGES, STAGE_KEYS } from '../lib/site';
+---
+<figure class="fig1">
+  <div class="fig1-track">
+    <ol class="fig1-row" role="list">
+      {STAGE_KEYS.map((key, i) => (
+        <Fragment>
+          {i > 0 && (
+            <li class="fig1-arrow" aria-hidden="true"><Icon name="arrow-right" size={24} /></li>
+          )}
+          <li class:list={['fig1-box', i === 0 && 'is-current']} data-step={i}>
+            <Icon name={STAGES[key].mark} size={32} class="fig1-mark" />
+            <span class="fig1-text">
+              <span class="fig1-num">§{STAGES[key].n}</span>
+              <span class="fig1-name">{STAGES[key].label}</span>
+            </span>
+          </li>
+        </Fragment>
+      ))}
+    </ol>
+    <div class="fig1-return" aria-hidden="true">
+      <span class="fig1-repeat"><Icon name="repeat" size={14} />Repeat</span>
+    </div>
+  </div>
+  <figcaption class="fig1-caption">Fig. 1: The dumb idea loop §1–§4</figcaption>
+</figure>
+
+<script>
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll<HTMLElement>('.fig1').forEach((fig) => {
+    if (reduce) return;
+    const boxes = [...fig.querySelectorAll<HTMLElement>('.fig1-box')];
+    let i = 0;
+    const tick = () => {
+      boxes.forEach((b, j) => b.classList.toggle('is-current', j === i));
+      const wait = i === 0 ? 3400 : 2400;
+      i = (i + 1) % boxes.length;
+      setTimeout(tick, wait);
+    };
+    tick();
+  });
+</script>
+
+<style>
+  .fig1 { margin: 0; }
+  .fig1-track { position: relative; padding-bottom: 28px; }
+  .fig1-row {
+    display: grid;
+    grid-template-columns: 1fr 40px 1fr 40px 1fr 40px 1fr;
+    align-items: stretch;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .fig1-box {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border: 1px solid var(--ink);
+    padding: 16px;
+    background: var(--memo);
+    color: var(--ink);
+    transition: background-color 120ms ease-out;
+  }
+  .fig1-box.is-current { background: var(--highlighter); }
+  .fig1-text { display: flex; flex-direction: column; gap: 12px; }
+  .fig1-num { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.06em; }
+  .fig1-name { font-family: 'Libre Caslon Text', serif; font-size: 22px; line-height: 1.1; }
+  .fig1-arrow { display: flex; align-items: center; justify-content: center; color: var(--ink); }
+  .fig1-return {
+    position: absolute;
+    left: 12.5%;
+    right: 12.5%;
+    bottom: 0;
+    height: 28px;
+    border: 1px solid var(--ink);
+    border-top: 0;
+  }
+  .fig1-repeat {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translate(-50%, 50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 8px;
+    background: var(--memo);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .fig1-caption {
+    font-family: 'Libre Caslon Text', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-2);
+    margin-top: 24px;
+  }
+
+  /* Under 640px: stack vertically, arrows point down, return line on the right. */
+  @media (max-width: 639px) {
+    .fig1-track { padding-bottom: 0; padding-right: 40px; }
+    .fig1-row { grid-template-columns: 1fr; grid-template-rows: 80px 40px 80px 40px 80px 40px 80px; }
+    .fig1-box { flex-direction: row; align-items: center; gap: 16px; padding: 0 16px; }
+    .fig1-text { gap: 4px; }
+    .fig1-arrow :global(svg) { transform: rotate(90deg); }
+    .fig1-return {
+      left: auto; right: 0; top: 40px; bottom: 40px;
+      width: 28px; height: auto;
+      border: 1px solid var(--ink);
+      border-left: 0;
+    }
+    .fig1-repeat {
+      left: auto; right: 0; top: 50%; bottom: auto;
+      transform: translate(50%, -50%) rotate(90deg);
+    }
+  }
+</style>

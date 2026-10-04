@@ -1,4 +1,5 @@
 ---
+import Icon from './Icon.astro';
 const navItems = [
   { href: '/', label: 'Home' },
   { href: '/blog', label: 'Blog' },
@@ -6,26 +7,49 @@ const navItems = [
   { href: '/contact', label: 'Contact' },
 ];
 const currentPath = Astro.url.pathname;
+const isActive = (href: string) => currentPath === href || (href !== '/' && currentPath.startsWith(href));
 ---
 <header class="container-memo pt-5">
-  <div class="flex items-center gap-6 border-b border-ink pb-3">
-    <a href="/" class="font-serif font-bold text-[18px] text-ink lowercase shrink-0 focus-visible:outline-2">dumbgtm</a>
-    <nav class="ml-auto flex items-center gap-4 sm:gap-6 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Main">
-      {navItems.map((item) => {
-        const active = currentPath === item.href || (item.href !== '/' && currentPath.startsWith(item.href));
-        return (
-          <a
-            href={item.href}
-            aria-current={active ? 'page' : undefined}
-            class:list={['nav-link t-label whitespace-nowrap px-1 py-1', active && 'nav-active']}
-          >
-            {item.label}
-          </a>
-        );
-      })}
+  <div class="relative flex items-center gap-6 border-b border-ink pb-3">
+    <a href="/" class="font-serif font-bold text-[18px] text-ink lowercase shrink-0">dumbgtm</a>
+
+    <nav class="ml-auto hidden sm:flex items-center gap-6" aria-label="Main">
+      {navItems.map((item) => (
+        <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}
+          class:list={['nav-link t-label whitespace-nowrap px-1 py-1', isActive(item.href) && 'nav-active']}>
+          {item.label}
+        </a>
+      ))}
+    </nav>
+
+    <button type="button" class="nav-toggle sm:hidden ml-auto p-2 -mr-2 text-ink" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav">
+      <span class="icon-open"><Icon name="menu" size={20} /></span>
+      <span class="icon-close hidden"><Icon name="close" size={20} /></span>
+    </button>
+
+    <nav id="mobile-nav" class="mobile-nav hidden sm:hidden absolute left-0 right-0 top-full z-20 bg-memo border-b border-ink" aria-label="Main">
+      {navItems.map((item) => (
+        <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}
+          class:list={['nav-link t-label block px-1 py-4 border-t border-rule', isActive(item.href) && 'nav-active']}>
+          {item.label}
+        </a>
+      ))}
     </nav>
   </div>
 </header>
+
+<script>
+  const btn = document.querySelector<HTMLButtonElement>('.nav-toggle');
+  const menu = document.getElementById('mobile-nav');
+  btn?.addEventListener('click', () => {
+    const open = btn.getAttribute('aria-expanded') !== 'true';
+    btn.setAttribute('aria-expanded', String(open));
+    btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    menu?.classList.toggle('hidden', !open);
+    btn.querySelector('.icon-open')?.classList.toggle('hidden', open);
+    btn.querySelector('.icon-close')?.classList.toggle('hidden', !open);
+  });
+</script>
 
 <style>
   .nav-link { color: var(--ink); transition: background-color 120ms ease-out, color 120ms ease-out; }

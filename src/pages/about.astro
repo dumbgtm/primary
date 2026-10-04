@@ -1,53 +1,60 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import HolePunch from '../components/HolePunch.astro';
 import MemoHeader from '../components/MemoHeader.astro';
 import SignatureBlock from '../components/SignatureBlock.astro';
+import Stamp from '../components/Stamp.astro';
 ---
 <BaseLayout title="About" description="Why dumbGTM exists: a marketing idea that got me fired, then worked somewhere else.">
   <article class="container-memo pt-12 sm:pt-16">
-    <div class="max-w-[68ch] flex flex-col gap-7">
-      <MemoHeader rows={[
-        { label: 'TO:', value: 'Whoever asked' },
-        { label: 'FROM:', value: 'The Author' },
-        { label: 'RE:', value: 'The origin story' },
-      ]} />
-      <h1 class="t-h1 text-ink">Why "dumb"?</h1>
-    </div>
+    <HolePunch>
+      <div class="max-w-[68ch] flex flex-col gap-7">
+        <MemoHeader rows={[
+          { label: 'TO:', value: 'Whoever asked' },
+          { label: 'FROM:', value: 'The Author' },
+          { label: 'RE:', value: 'The origin story' },
+        ]} />
+        <h1 class="t-h1 text-ink">Why "dumb"?</h1>
+      </div>
 
-    <div class="prose-memo mt-10">
-      <p>
-        A while back I pitched a marketing idea at work. It was cheap, a bit odd, and nobody in
-        our space was doing it. Leadership thought it was a dumb idea. Not long after that, I was
-        let go.
-      </p>
-      <p>At my next job I pitched the same idea, and my new boss told me to try it. It worked.</p>
-      <p>The idea was the same at both companies. What changed was whether someone let me try it.</p>
-      <p>
-        Since then I've noticed the same pattern all over marketing. The tactics everyone uses now
-        started out as ideas someone had to fight for. Then they worked, everyone copied them, and
-        they got boring. Then someone came up with a new dumb idea and the loop started again.
-      </p>
+      <div class="prose-memo mt-10">
+        <p>
+          A while back I pitched a marketing idea at work. It was cheap, a bit odd, and nobody in
+          our space was doing it. Leadership thought it was a dumb idea. Not long after that, I was
+          let go.
+        </p>
+        <p>At my next job I pitched the same idea, and my new boss told me to try it. It worked.</p>
+        <p>The idea was the same at both companies. What changed was whether someone let me try it.</p>
+        <p>
+          Since then I've noticed the same pattern all over marketing. The tactics everyone uses now
+          started out as ideas someone had to fight for. Then they worked, everyone copied them, and
+          they got boring. Then someone came up with a new dumb idea and the loop started again.
+        </p>
 
-      <h2>What you'll find here</h2>
-      <p>
-        Blog posts and videos about marketing ideas that sound wrong at first. Some of them are
-        early. Some are old ideas that have gone stale and need retiring. A few will be bad, and
-        I'll say so when that happens.
-      </p>
+        <h2>What you'll find here</h2>
+        <p>
+          Blog posts and videos about marketing ideas that sound wrong at first. Some of them are
+          early. Some are old ideas that have gone stale and need retiring. A few will be bad, and
+          I'll say so when that happens.
+        </p>
 
-      <h2>Who's writing this</h2>
-      <p>
-        I've worked in growth and lifecycle marketing for most of my career. For now I'm keeping my
-        name off the site. Judge the ideas, not the byline.
-      </p>
+        <h2>Who's writing this</h2>
+        <p>
+          I've worked in growth and lifecycle marketing for most of my career. For now I'm keeping my
+          name off the site. Judge the ideas, not the byline.
+        </p>
 
-      <h2>Say hi</h2>
-      <p>Got a dumb idea your team shot down? <a href="/contact">Send it over.</a></p>
-    </div>
+        <h2>Say hi</h2>
+        <p>Got a dumb idea your team shot down? <a href="/contact">Send it over.</a></p>
+      </div>
 
-    <div class="max-w-[68ch] mt-10">
-      <SignatureBlock name="The Author" subtitle="Name withheld. Feelings: on file." />
-      <div class="double-rule mt-12"></div>
-    </div>
+      <div class="max-w-[68ch] mt-12 pb-4">
+        <div class="relative inline-block pt-10 pr-6">
+          <SignatureBlock />
+          <Stamp text="Dumb" italic over="Certified" sub="§1 of 4" rotate={-6} class="absolute -top-6 -right-14" />
+        </div>
+        <div class="double-rule mt-12"></div>
+      </div>
+    </HolePunch>
   </article>
 </BaseLayout>

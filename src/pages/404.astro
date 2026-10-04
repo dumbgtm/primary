@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import MemoHeader from '../components/MemoHeader.astro';
+import Stamp from '../components/Stamp.astro';
+---
+<BaseLayout title="Page not found" description="This page could not be located in the filing cabinet.">
+  <section class="container-memo pt-12 sm:pt-16 pb-8">
+    <div class="relative max-w-[760px] flex flex-col gap-7">
+      <span class="hidden sm:block absolute right-0 top-0"><Stamp text="Denied" size={28} rotate={-6} /></span>
+      <MemoHeader rows={[
+        { label: 'TO:', value: 'You' },
+        { label: 'FROM:', value: 'Records department' },
+        { label: 'RE:', value: 'Request for page 404' },
+      ]} />
+      <h1 class="t-h1 text-ink max-w-[640px]">This page could not be located in the filing cabinet.</h1>
+      <p class="t-body-mono">It may have been moved, shredded or never approved in the first place.</p>
+      <div class="flex flex-wrap gap-3">
+        <a href="/" class="btn-primary">Back to the homepage<Icon name="arrow-right" size={16} /></a>
+        <a href="/blog" class="btn-secondary"><Icon name="folder" size={16} />Browse the blog</a>
+      </div>
+      <span class="sm:hidden self-start mt-4"><Stamp text="Denied" size={22} rotate={-6} /></span>
+    </div>
+  </section>
+</BaseLayout>

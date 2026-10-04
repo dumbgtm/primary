@@ -1,9 +1,12 @@
 ---
-interface Props { href: string; label: string; primary?: boolean }
-const { href, label, primary = false } = Astro.props;
+import Icon from './Icon.astro';
+interface Props { href: string; label: string; icon?: 'video' | 'arrow-up-right'; primary?: boolean }
+const { href, label, icon = 'arrow-up-right', primary = false } = Astro.props;
 ---
 {href ? (
-  <a href={href} target="_blank" rel="noopener" class={primary ? 'btn-primary' : 'btn-secondary'}>{label} →</a>
+  <a href={href} target="_blank" rel="noopener" class={primary ? 'btn-primary' : 'btn-secondary'}>
+    <Icon name={icon} size={16} />{label}
+  </a>
 ) : (
-  <span class="btn-disabled" aria-disabled="true" title="Channel launching soon">{label} (pending approval)</span>
+  <span class="btn-disabled" aria-disabled="true"><Icon name={icon} size={16} />{label}</span>
 )}

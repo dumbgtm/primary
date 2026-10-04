@@ -56,17 +56,17 @@
 
   /* Buttons */
   .btn-primary {
-    @apply inline-flex items-center justify-center bg-blue font-mono font-bold text-[12px] text-memo px-[18px] py-[14px] sm:px-4 sm:py-3 min-h-[44px] sm:min-h-0;
+    @apply inline-flex items-center justify-center gap-2 bg-blue font-mono font-bold text-[12px] text-memo px-[18px] py-[14px] sm:px-4 sm:py-3 min-h-[44px] sm:min-h-0;
     transition: background-color 120ms ease-out, color 120ms ease-out;
   }
   .btn-primary:hover { background: var(--blue-hover); }
   .btn-secondary {
-    @apply inline-flex items-center justify-center border border-ink font-mono font-bold text-[12px] text-ink px-[18px] py-[13px] sm:px-4 sm:py-[11px] min-h-[44px] sm:min-h-0;
+    @apply inline-flex items-center justify-center gap-2 border border-ink font-mono font-bold text-[12px] text-ink px-[18px] py-[13px] sm:px-4 sm:py-[11px] min-h-[44px] sm:min-h-0;
     transition: background-color 120ms ease-out, color 120ms ease-out;
   }
   .btn-secondary:hover { background: var(--ink); color: var(--memo); }
   .btn-disabled {
-    @apply inline-flex items-center justify-center border border-staple font-mono font-bold text-[12px] text-muted px-[18px] py-[13px] sm:px-4 sm:py-[11px] min-h-[44px] sm:min-h-0 cursor-default;
+    @apply inline-flex items-center justify-center gap-2 border border-staple font-mono font-bold text-[12px] text-muted px-[18px] py-[13px] sm:px-4 sm:py-[11px] min-h-[44px] sm:min-h-0 cursor-default;
   }
 
   /* Links */
@@ -79,9 +79,9 @@
   .link:hover { color: var(--ink); background: var(--highlighter); }
 
   /* Tags */
-  .tag { @apply inline-block font-mono text-[10px] uppercase px-2 py-[3px] border border-ink text-ink; letter-spacing: 0.06em; line-height: 1.4; }
-  .tag-inverse { @apply inline-block font-mono text-[10px] uppercase px-2 py-[3px] bg-ink text-memo border border-ink; letter-spacing: 0.06em; line-height: 1.4; }
-  .tag-highlighter { @apply inline-block font-mono text-[10px] uppercase px-2 py-[3px] bg-highlighter text-ink; letter-spacing: 0.06em; line-height: 1.4; }
+  .tag { @apply inline-block whitespace-nowrap font-mono text-[10px] uppercase px-2 py-[3px] border border-ink text-ink; letter-spacing: 0.06em; line-height: 1.4; }
+  .tag-inverse { @apply inline-block whitespace-nowrap font-mono text-[10px] uppercase px-2 py-[3px] bg-ink text-memo border border-ink; letter-spacing: 0.06em; line-height: 1.4; }
+  .tag-highlighter { @apply inline-block whitespace-nowrap font-mono text-[10px] uppercase px-2 py-[3px] bg-highlighter text-ink; letter-spacing: 0.06em; line-height: 1.4; }
 
   /* Form fields */
   .field {
@@ -90,6 +90,50 @@
   }
   .field:focus { outline: none; background: var(--memo); box-shadow: inset 0 0 0 1px var(--blue); }
   .field:focus-visible { outline: none; }
+
+  /* Paper ornaments (Graphics Kit §04) */
+  .redact {
+    background: var(--ink);
+    color: var(--ink);
+    padding: 0 2px;
+    user-select: none;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+  .carbon-copy { position: relative; }
+  .carbon-copy::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translate(6px, 6px);
+    border: 1px solid var(--staple);
+    background: var(--carbon);
+    z-index: -1;
+  }
+  .ruled {
+    background-color: var(--memo);
+    background-image:
+      linear-gradient(90deg, transparent 47px, var(--staple) 47px, var(--staple) 48px, transparent 48px),
+      repeating-linear-gradient(180deg, transparent 0 27px, var(--rule) 27px 28px);
+    line-height: 28px;
+    padding-left: 64px;
+  }
+  .perforation {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .perforation::before, .perforation::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: repeating-linear-gradient(90deg, var(--ink) 0 6px, transparent 6px 12px);
+  }
 
   /* Long-form article body */
   .prose-memo { @apply font-serif text-ink2 text-[19px]; line-height: 1.65; max-width: 68ch; }
@@ -102,4 +146,13 @@
   .prose-memo ol { @apply list-decimal pl-6 mb-6 space-y-2; }
   .prose-memo blockquote { @apply border-l border-ink pl-5 italic text-ink my-8; }
   .prose-memo strong { @apply text-ink font-bold; }
+  .prose-memo img { border: 1px solid var(--ink); display: block; max-width: 100%; height: auto; }
+  .prose-memo figure { margin: 32px 0; }
+  .prose-memo figcaption {
+    font-family: 'Libre Caslon Text', serif;
+    font-style: italic;
+    font-size: 14px;
+    margin-top: 8px;
+    color: var(--ink-2);
+  }
 }

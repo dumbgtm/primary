@@ -1,8 +1,12 @@
 ---
-interface Props { name: string; subtitle: string; class?: string }
-const { name, subtitle, class: extra = '' } = Astro.props;
+// Signature block. The name is redacted with filler text (never the real name,
+// since redacted text is still in the page source).
+interface Props { name?: string; class?: string }
+const { name = 'The Author', class: extra = '' } = Astro.props;
 ---
-<div class:list={['inline-block border border-ink px-[14px] py-2', extra]}>
+<div class:list={['inline-block border border-ink bg-memo px-[14px] py-2', extra]}>
   <p class="font-serif font-bold text-[15px] text-ink leading-tight">{name}</p>
-  <p class="font-mono text-[10px] text-muted mt-0.5">{subtitle}</p>
+  <p class="font-mono text-[10px] text-muted mt-1">
+    Name: <span class="redact" aria-label="redacted" role="img">Xxxxx Xxxxxx</span>. Feelings: on file.
+  </p>
 </div>

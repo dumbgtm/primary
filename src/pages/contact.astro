@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
 import MemoHeader from '../components/MemoHeader.astro';
 
 const topics = [
@@ -31,7 +32,7 @@ const topics = [
         Until then this form won't actually send anywhere.
       -->
       <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST" class="border border-ink p-5 sm:p-8 flex flex-col gap-6">
-        <p class="t-label text-muted border-b border-rule pb-3">Form DG-1: Idea submission</p>
+        <p class="t-label text-muted border-b border-rule pb-3 inline-flex items-center gap-2"><Icon name="clipboard" size={16} />Form DG-1: Idea submission</p>
         <div>
           <label for="name" class="t-label text-ink block mb-2">Name</label>
           <input id="name" name="name" type="text" required class="field" />
@@ -42,7 +43,7 @@ const topics = [
         </div>
         <div>
           <label for="message" class="t-label text-ink block mb-2">Message</label>
-          <textarea id="message" name="message" rows="5" required class="field resize-y"></textarea>
+          <textarea id="message" name="message" rows="6" required class="field ruled-field resize-y"></textarea>
         </div>
         <fieldset class="border border-ink p-4">
           <legend class="t-label text-ink px-1">What's this about?</legend>
@@ -56,12 +57,12 @@ const topics = [
           </div>
         </fieldset>
         <div>
-          <button type="submit" class="btn-primary">Send it →</button>
+          <button type="submit" class="btn-primary"><Icon name="mail" size={16} />Send it</button>
         </div>
       </form>
 
       <p class="t-small">
-        Prefer email? <a href="mailto:hello@dumbgtm.com" class="link">hello@dumbgtm.com</a>
+        Prefer email? <a href="mailto:hello@dumbgtm.com" class="link inline-flex items-center gap-[6px]"><Icon name="mail" size={12} />hello@dumbgtm.com</a>
       </p>
     </div>
   </section>
@@ -79,5 +80,16 @@ const topics = [
   }
   .check::before { content: ''; width: 8px; height: 8px; background: var(--ink); transform: scale(0); transition: transform 120ms ease-out; }
   .check:checked::before { transform: scale(1); }
+  /* Ruled paper message box (Graphics Kit §04.6) */
+  .ruled-field {
+    background-color: var(--memo);
+    background-image:
+      linear-gradient(90deg, transparent 47px, var(--staple) 47px, var(--staple) 48px, transparent 48px),
+      repeating-linear-gradient(180deg, transparent 0 27px, var(--rule) 27px 28px);
+    background-attachment: local;
+    line-height: 28px;
+    padding: 0 12px 0 64px;
+  }
+  .ruled-field:focus { background-color: var(--memo); }
   .check:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 </style>

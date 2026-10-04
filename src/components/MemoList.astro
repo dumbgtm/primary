@@ -1,24 +1,29 @@
 ---
-// Post index styled as a memo register: number / title + RE line / date.
+// Post index styled as a memo register: number / title + RE line / date + read time.
 import type { CollectionEntry } from 'astro:content';
 import StageBadge from './StageBadge.astro';
+import Icon from './Icon.astro';
+import { readTime } from '../lib/site';
 
 interface Item { post: CollectionEntry<'blog'>; n: number }
-interface Props { items: Item[]; filterable?: boolean }
-const { items, filterable = false } = Astro.props;
+interface Props { items: Item[]; filterable?: boolean; compact?: boolean }
+const { items, filterable = false, compact = false } = Astro.props;
 const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 ---
 <ol class="border-t border-ink">
   {items.map(({ post, n }) => (
     <li class="memo-row" data-stage={filterable ? post.data.stage ?? '' : undefined}>
-      <a href={`/blog/${post.slug}`} class="grid gap-x-6 gap-y-2 py-5 px-2 sm:px-3 grid-cols-[1fr_auto] sm:grid-cols-[120px_1fr_auto] items-baseline">
-        <div class="font-mono text-[12px] text-muted flex sm:flex-col gap-3 sm:gap-2 items-start">
+      <a href={`/blog/${post.slug}`} class:list={['grid gap-x-6 gap-y-2 py-5 px-2 sm:px-3 grid-cols-[1fr_auto] items-baseline', !compact && 'sm:grid-cols-[120px_1fr_auto]']}>
+        <div class:list={['font-mono text-[12px] text-muted flex gap-3 items-center', !compact && 'sm:flex-col sm:gap-2 sm:items-start']}>
           <span>Memo {String(n).padStart(3, '0')}</span>
           {post.data.stage && <StageBadge stage={post.data.stage} />}
         </div>
-        <time class="font-mono text-[12px] text-ink sm:order-last text-right" datetime={post.data.pubDate.toISOString()}>{fmt(post.data.pubDate)}</time>
-        <div class="col-span-2 sm:col-span-1">
-          <h3 class="font-serif text-[24px] leading-[1.2] text-ink memo-title">{post.data.title}</h3>
+        <div class:list={['font-mono text-[12px] text-ink text-right flex flex-col items-end gap-1', !compact && 'sm:order-last']}>
+          <time datetime={post.data.pubDate.toISOString()}>{fmt(post.data.pubDate)}</time>
+          <span class="text-muted inline-flex items-center gap-[6px]"><Icon name="clock" size={12} />{readTime(post.body)} min read</span>
+        </div>
+        <div class:list={['col-span-2', !compact && 'sm:col-span-1']}>
+          <h3 class="font-serif text-[24px] leading-[1.2] text-ink">{post.data.title}</h3>
           <p class="font-mono text-[12px] text-muted mt-2 leading-[1.6]">RE: {post.data.description}</p>
         </div>
       </a>
@@ -29,5 +34,4 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', day: 'n
 <style>
   .memo-row { border-bottom: 1px solid var(--rule); transition: background-color 120ms ease-out; }
   .memo-row:hover { background: var(--carbon); }
-  .memo-row a:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 </style>
