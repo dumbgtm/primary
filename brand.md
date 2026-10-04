@@ -64,8 +64,8 @@ Logo: see **Logo** at the end of this file. Always use the files in `public/bran
 
 ## Motion
 Transitions are 120ms ease-out on color and background only. No scroll or entrance animations.
-The one exception is Fig. 1 on the homepage, where the highlighter steps §1→§4 every 2.4s and
-holds on §1 for an extra second. Everything respects `prefers-reduced-motion`.
+The one exception is Fig. 1, the animated loop chart in the homepage hero (see "Hero loop" below).
+Everything respects `prefers-reduced-motion`.
 
 ---
 
@@ -123,14 +123,8 @@ Everything follows the rules above: ink lines, 0 radius, no shadows, no gradient
 8. Figure caption: every article image is "Fig. N"; 1px ink border; caption Caslon italic 14px, 8px below,
    ending with a stage § when relevant ("Fig. 2: A pricing page that has given up §4").
 
-## §05 Fig. 1: the dumb idea loop (`Fig1.astro`, homepage hero)
-- Grid `1fr 40px 1fr 40px 1fr 40px 1fr`. Boxes: 1px ink border, padding 16, 12px gap, 32px stage mark,
-  10px "§N", name in Caslon 22px. 24px arrow-right centred in each 40px column.
-- §1 has a highlighter background ("you are here").
-- Return line: 28px bracket under the row (1px ink, no top), inset 12.5% each side, "↻ REPEAT" centred on its
-  bottom edge (14px repeat icon, 10px uppercase, 0.12em, memo background).
-- Caption "Fig. 1: The dumb idea loop §1–§4", Caslon italic 14px.
-- Under 640px: stacked, arrows rotated 90°, return bracket on the right.
+## §05 Fig. 1: the dumb idea loop
+Superseded by the hero loop handoff below (the animated chart replaced the HTML/CSS flowchart).
 
 ## §06 Share images (`scripts/og-template.html`, 1200x630)
 - Memo background, 64px/72px padding; header row with the wordmark SVG at 44px tall on the left, 2px ink rule, 20px below.
@@ -201,3 +195,41 @@ Rules:
 - Construction: Caslon Bold at 100 units, default kerning; bar from 0.1em before "d" to 0.1em after "b", 0.9em above
   the baseline to 0.2em below, square ends, running under the edge of the "g" on purpose; the mark's "d" is 72% of the
   square's height, optically centred.
+
+---
+
+# Hero loop: "Fig. 1: The dumb idea loop" (animated)
+
+_Source: Claude Design handoff "Hero Loop Reference" (design_handoff_dumbgtm_hero_loop). High fidelity: the constants in
+`src/lib/loop.ts` (ported 1:1 from the reference `DumbIdeaLoop.jsx`) are the spec._
+
+An animated whiteboard chart: a results line draws through the four stages, a dashed "everyone else" line catches up,
+both flatten, then a marker swings back to §1 as a "NEW DUMB IDEA" and the cycle repeats over a grey ghost of the
+previous curve. 14s loop. Component: `src/components/LoopFigure.astro`.
+
+- Placement: right column of the hero (copy, buttons and author block on the left). 1px ink frame,
+  `width: 100%; max-width: 480px; aspect-ratio: 480/560`. Under 900px the hero stacks and the figure sits below the
+  author block, centred. Under 400px the tabs show only §1–§4.
+- Structure (24px padding, 16px gaps): header "FIG. 1: THE DUMB IDEA LOOP" / "§1–§4 ↻" (mono 11, uppercase, 0.12em,
+  muted, rule hairline); chart SVG `viewBox 0 0 410 290`; caption Caslon italic 17/1.3, min-height 44, fades and rises
+  6px over 0.4s on each stage change; tabs `repeat(4,1fr) 40px`, 6px gap, 1px ink border, 10px uppercase labels,
+  7x8 padding, active tab ink with memo text and a 3px highlighter progress bar; fifth tab is "↻".
+- Chart: axes polyline 30,14 → 30,250 → 404,250 (ink 1.5); "RESULTS" at (36,24), "TIME →" end-anchored at (404,286)
+  (mono 10, muted). Zone hairlines at x = 122.5, 215, 307.5; §1–§4 labels at y=270, active one ink 700.
+- Results line (ink 2.5, miter): 30,236 122,230 140,205 215,72 240,50 268,54 300,84 340,98 400,100, drawn by truncating
+  at x(t) = 30 + 370·(t/12) with an interpolated end (no dash-offset reveal, so the marker sits on the end).
+- Everyone else (staple 1.5, dashed 5 5): 30,246 150,246 200,200 260,96 300,80 340,98 400,100, same truncation; label
+  "everyone else" Caslon italic 14 muted at (min(x,330)−6, lineY+30), fading in as x goes 260→290.
+- Marker: r=7, highlighter fill, 2px ink stroke. Label rect 18 tall, 10 above, 88 wide ("YOU ARE HERE", memo on ink)
+  or 104 wide ("NEW DUMB IDEA", ink on highlighter); mono 10/700; x clamped to the chart.
+- Ghost (cycle 2+): full results polyline in rule colour, 2 stroke, "the last dumb idea" Caslon italic 12 at (120,212),
+  fading out as x goes 90→120.
+- Timeline (t = elapsed % 14): 0–3 §1 "Proposed in a meeting. Immediately laughed at."; 3–6 §2 "Tried anyway. Numbers go
+  up. Nobody knows why."; 6–9 §3 "Now it's a carousel, a course, and 100 AI tools."; 9–12 §4 "Buyers have seen it 400
+  times. It's in the playbook."; 12–14 ↻ "Someone in the back says "what if we…" Back to §1." Repeat phase: line greys
+  12.0–12.5; return arc `M400 100 C400 4, 30 4, 30 236` draws 12.3–13.1 (pathLength 1 + dashoffset); marker rides it
+  12.3–13.3 (easeInOutCubic) labelled NEW DUMB IDEA; arrowhead 24,226 30,236 36,226 at 13.1; landing hop (6 units,
+  0.3s) 13.3–13.8 while the arc fades. easeOutCubic for fades, captions and hop.
+- Behaviour: one requestAnimationFrame clock; pauses offscreen (IntersectionObserver) or when the tab is hidden and
+  resumes where it left off; `prefers-reduced-motion` shows a static frame at t=7.5 (also the server-rendered frame).
+- Accessibility: `<figure>` + `<figcaption>`, SVG `role="img"` with a summary aria-label, tabs `aria-hidden`, no aria-live.

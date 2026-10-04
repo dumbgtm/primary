@@ -1,0 +1,205 @@
+---
+// Fig. 1: The dumb idea loop — animated hero chart (hero loop handoff).
+// Server-renders the static mid-§3 frame (also the reduced-motion frame);
+// the client script drives every frame from one rAF clock.
+import { C, STAGES, AXIS, ZONES, RESULTS, ARC_D, STATIC_FRAME, frame, toPoints } from '../lib/loop';
+const f = frame(STATIC_FRAME);
+---
+<figure class="loopfig" data-loopfig aria-labelledby="fig1-cap">
+  <div class="lf-header"><span>Fig. 1: The dumb idea loop</span><span class="ml-auto">§1–§4 ↻</span></div>
+
+  <div class="lf-stage">
+    <svg viewBox="0 0 410 290" role="img"
+      aria-label="Chart: a dumb idea's results rise, competitors copy it, results flatten, then a new dumb idea starts the loop again.">
+      {ZONES.slice(1, 4).map((zx) => <line x1={zx} y1={20} x2={zx} y2={AXIS.yBase} stroke={C.rule} stroke-width="1" />)}
+      {ZONES.slice(0, 4).map((zx, i) => (
+        <text data-zone={i} x={(zx + ZONES[i + 1]) / 2} y="270" text-anchor="middle" font-family="'Space Mono', monospace"
+          font-size="10" letter-spacing="1" fill={i === f.activeZone ? C.ink : C.muted} font-weight={i === f.activeZone ? 700 : 400}>{STAGES[i].n}</text>
+      ))}
+      <polyline points={`${AXIS.x0},${AXIS.yTop} ${AXIS.x0},${AXIS.yBase} ${AXIS.x1},${AXIS.yBase}`} fill="none" stroke={C.ink} stroke-width="1.5" />
+      <text x="36" y="24" font-family="'Space Mono', monospace" font-size="10" fill={C.muted} letter-spacing="1">RESULTS</text>
+      <text x="404" y="286" font-family="'Space Mono', monospace" font-size="10" fill={C.muted} letter-spacing="1" text-anchor="end">TIME →</text>
+
+      <g data-ghost opacity={f.ghostPrevOpacity}>
+        <polyline points={toPoints(RESULTS)} fill="none" stroke={C.rule} stroke-width="2" />
+        <text data-ghost-label x="120" y="212" text-anchor="middle" font-family="'Libre Caslon Text', serif" font-style="italic"
+          font-size="12" fill={C.muted} opacity={f.ghostLabelOpacity}>the last dumb idea</text>
+      </g>
+
+      <g data-evr opacity={f.evrOpacity}>
+        <polyline data-evr-line points={f.evrPoints} fill="none" stroke={C.staple} stroke-width="1.5" stroke-dasharray="5 5" />
+        <text data-evr-label x={f.evrLabel.x} y={f.evrLabel.y} text-anchor="end" font-family="'Libre Caslon Text', serif" font-style="italic"
+          font-size="14" fill={C.muted} opacity={f.evrLabel.show ? f.evrLabel.opacity : 0}>everyone else</text>
+      </g>
+
+      <polyline data-res points={f.resPoints} fill="none" stroke={f.resStroke} stroke-width={f.resWidth} stroke-linejoin="miter" />
+
+      <g data-arc opacity={f.arcOpacity}>
+        <path data-arc-path d={ARC_D} fill="none" stroke={C.ink} stroke-width="1.5" pathLength="1" stroke-dasharray="1" stroke-dashoffset={f.arcOffset} />
+        <polyline data-arrow points="24,226 30,236 36,226" fill="none" stroke={C.ink} stroke-width="1.5" opacity={f.arrowOpacity} />
+      </g>
+
+      <circle data-marker cx={f.head[0]} cy={f.head[1]} r="7" fill={C.highlighter} stroke={C.ink} stroke-width="2" />
+      <g data-label transform={`translate(${f.labelX},${f.labelY})`}>
+        <rect data-label-rect x={-f.labelW / 2} y="-14" width={f.labelW} height="18" fill={f.isNew ? C.highlighter : C.ink} />
+        <text data-label-text x="0" y="-1" text-anchor="middle" font-family="'Space Mono', monospace" font-size="10" font-weight="700"
+          letter-spacing="1" fill={f.isNew ? C.ink : C.memo}>{f.label}</text>
+      </g>
+    </svg>
+  </div>
+
+  <figcaption id="fig1-cap" class="lf-caption" data-caption>{STAGES[f.si].copy}</figcaption>
+
+  <ol class="lf-tabs" aria-hidden="true">
+    {STAGES.map((s, i) => (
+      <li class:list={['lf-tab', i === f.si && 'is-on']} data-tab={i}>
+        <span class="lf-tab-label" style={i === 4 ? 'text-align:center' : ''}>
+          {i === 4 ? '↻' : <Fragment>{s.n}<span class="lf-name"> {s.name}</span></Fragment>}
+        </span>
+        <span class="lf-bar" data-bar style={`width:${i === f.si ? f.progress : 0}%`}></span>
+      </li>
+    ))}
+  </ol>
+</figure>
+
+<script>
+  import { C, STAGES, STATIC_FRAME, frame } from '../lib/loop';
+
+  document.querySelectorAll<HTMLElement>('[data-loopfig]').forEach((fig) => {
+    const $ = <T extends Element>(sel: string) => fig.querySelector<T>(sel)!;
+    const zones = [...fig.querySelectorAll<SVGTextElement>('[data-zone]')];
+    const tabs = [...fig.querySelectorAll<HTMLLIElement>('[data-tab]')];
+    const bars = tabs.map((t) => t.querySelector<HTMLElement>('[data-bar]')!);
+    const ghost = $('[data-ghost]'), ghostLabel = $('[data-ghost-label]');
+    const evr = $('[data-evr]'), evrLine = $('[data-evr-line]'), evrLabel = $('[data-evr-label]');
+    const res = $('[data-res]');
+    const arc = $('[data-arc]'), arcPath = $('[data-arc-path]'), arrow = $('[data-arrow]');
+    const marker = $('[data-marker]');
+    const label = $('[data-label]'), labelRect = $('[data-label-rect]'), labelText = $('[data-label-text]');
+    const caption = $<HTMLElement>('[data-caption]');
+    let lastSi = -1;
+
+    const render = (elapsed: number) => {
+      const f = frame(elapsed);
+      zones.forEach((z, i) => {
+        z.setAttribute('fill', i === f.activeZone ? C.ink : C.muted);
+        z.setAttribute('font-weight', i === f.activeZone ? '700' : '400');
+      });
+      ghost.setAttribute('opacity', String(f.ghostPrevOpacity));
+      ghostLabel.setAttribute('opacity', String(f.ghostLabelOpacity));
+      evr.setAttribute('opacity', String(f.evrOpacity));
+      evrLine.setAttribute('points', f.evrPoints);
+      evrLabel.setAttribute('x', String(f.evrLabel.x));
+      evrLabel.setAttribute('y', String(f.evrLabel.y));
+      evrLabel.setAttribute('opacity', String(f.evrLabel.show ? f.evrLabel.opacity : 0));
+      res.setAttribute('points', f.resPoints);
+      res.setAttribute('stroke', f.resStroke);
+      res.setAttribute('stroke-width', String(f.resWidth));
+      arc.setAttribute('opacity', String(f.arcOpacity));
+      arcPath.setAttribute('stroke-dashoffset', String(f.arcOffset));
+      arrow.setAttribute('opacity', String(f.arrowOpacity));
+      marker.setAttribute('cx', String(f.head[0]));
+      marker.setAttribute('cy', String(f.head[1]));
+      label.setAttribute('transform', `translate(${f.labelX},${f.labelY})`);
+      labelRect.setAttribute('x', String(-f.labelW / 2));
+      labelRect.setAttribute('width', String(f.labelW));
+      labelRect.setAttribute('fill', f.isNew ? C.highlighter : C.ink);
+      labelText.setAttribute('fill', f.isNew ? C.ink : C.memo);
+      if (labelText.textContent !== f.label) labelText.textContent = f.label;
+
+      if (f.si !== lastSi) {
+        caption.textContent = STAGES[f.si].copy;
+        tabs.forEach((t, i) => t.classList.toggle('is-on', i === f.si));
+        lastSi = f.si;
+      }
+      caption.style.opacity = String(f.captionIn);
+      caption.style.transform = `translateY(${(1 - f.captionIn) * 6}px)`;
+      bars.forEach((b, i) => { b.style.width = i === f.si ? `${f.progress}%` : '0%'; });
+    };
+
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      render(STATIC_FRAME);
+      return;
+    }
+
+    // One clock. Pauses offscreen or when the tab is hidden; resumes where it left off.
+    let acc = 0, last: number | null = null, visible = true;
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(fig);
+    const tick = (now: number) => {
+      if (last !== null && visible && !document.hidden) acc += Math.max(0, now - last) / 1000;
+      last = now;
+      if (visible && !document.hidden) render(acc);
+      requestAnimationFrame(tick);
+    };
+    render(0);
+    requestAnimationFrame(tick);
+  });
+</script>
+
+<style>
+  .loopfig {
+    margin: 0;
+    width: 100%;
+    max-width: 480px;
+    aspect-ratio: 480 / 560;
+    box-sizing: border-box;
+    border: 1px solid var(--ink);
+    background: var(--memo);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    font-family: 'Space Mono', monospace;
+    color: var(--ink);
+  }
+  .lf-header {
+    display: flex;
+    align-items: center;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 12px;
+    color: var(--muted);
+  }
+  .lf-stage { flex: 1; min-height: 0; position: relative; overflow: hidden; }
+  .lf-stage svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .lf-caption {
+    min-height: 44px;
+    font-family: 'Libre Caslon Text', serif;
+    font-style: italic;
+    font-size: 17px;
+    line-height: 1.3;
+    text-wrap: pretty;
+  }
+  .lf-tabs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) 40px;
+    gap: 6px;
+  }
+  .lf-tab {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--ink);
+    background: var(--memo);
+    color: var(--ink);
+    transition: background-color 120ms ease-out, color 120ms ease-out;
+  }
+  .lf-tab.is-on { background: var(--ink); color: var(--memo); }
+  .lf-tab-label {
+    padding: 7px 8px;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .lf-bar { height: 3px; background: transparent; width: 0; }
+  .lf-tab.is-on .lf-bar { background: var(--highlighter); }
+  /* Under 400px: keep only §1–§4 on the tabs. */
+  @media (max-width: 399px) { .lf-name { display: none; } }
+</style>
