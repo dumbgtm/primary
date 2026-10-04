@@ -3,6 +3,7 @@ title: "Your GTM framework is a hostage situation with a nicer font"
 description: "The 40-slide framework isn't clarity. It's a way to make a simple decision take three months and require a consultant to explain it back to you."
 pubDate: 2026-06-27
 tags: ["frameworks", "strategy theater"]
+stage: "boring"
 ---
 
 There is a very specific kind of meeting that happens at every company eventually. Someone presents a GTM framework. It has a name, usually two words, usually one of them is "engine" or "flywheel" or "motion." It has four quadrants. Each quadrant has a color. There is a diagram with arrows that loop back into themselves, implying momentum, implying that something is happening.
@@ -20,12 +21,11 @@ The 40 slides exist so that when the plan doesn't work, nobody can say it was a 
 Good GTM decisions are almost embarrassingly plain when you say them out loud:
 
 - "We're going to call the twenty customers who churned last quarter and ask them why, this week."
-- - "We're cutting the segment that takes six months to close and doubling down on the one that closes in three weeks."
-  - - "Nobody's opening these emails. Stop sending them and go to the three events where our actual buyers already are."
-   
-    - None of that needs a quadrant. It needs someone willing to say the plain version out loud in a room full of people who'd rather look at a diagram.
-   
-    - ## The tell
-   
-    - If your GTM plan requires a glossary, it's not a plan, it's a costume. The best operators tend to talk about GTM the way a good mechanic talks about your car: short sentences, no jargon, and a clear next step you could act on before lunch. Everyone else is selling you the sound of strategy instead of the thing itself.
-    - 
+- "We're cutting the segment that takes six months to close and doubling down on the one that closes in three weeks."
+- "Nobody's opening these emails. Stop sending them and go to the three events where our actual buyers already are."
+
+None of that needs a quadrant. It needs someone willing to say the plain version out loud in a room full of people who'd rather look at a diagram.
+
+## The tell
+
+If your GTM plan requires a glossary, it's not a plan, it's a costume. The best operators tend to talk about GTM the way a good mechanic talks about your car: short sentences, no jargon, and a clear next step you could act on before lunch. Everyone else is selling you the sound of strategy instead of the thing itself.
