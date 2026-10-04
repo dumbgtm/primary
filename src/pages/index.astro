@@ -1,75 +1,112 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import HeroVisual from '../components/HeroVisual.astro';
+import LoopVisual from '../components/LoopVisual.astro';
+import StageBadge from '../components/StageBadge.astro';
+import SocialButton from '../components/SocialButton.astro';
 import { getCollection } from 'astro:content';
+import { STAGES, STAGE_KEYS, YOUTUBE_URL, LINKEDIN_URL } from '../lib/site';
 
 const posts = (await getCollection('blog', ({ data }) => !data.draft))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .slice(0, 3);
 
+const stageCopy = {
+  dumb: 'Someone suggests something contrarian. Nobody smart is doing anything like it. Maybe not your best idea, try again.',
+  working: "Nah, let's just run with it. It starts working, maybe solely because no one else is doing it. Either way, it becomes your unfair advantage.",
+  everywhere: 'Now there are case studies, LinkedIn posts, a course and a hundred AI tools that automate it. By next quarter all your competitors are doing it too.',
+  boring: "Buyers have seen it hundreds of times and results flatten out. Everyone keeps doing it anyway, because now it's in the playbook.",
+};
+
 const bits = [
   {
-    title: 'We say the quiet part',
-    body: "Your GTM plan is not a moat. Most tactics being sold to you right now are the same five ideas with a new coat of paint. We point at the paint.",
+    title: 'Early',
+    body: "We write about ideas while they still sound dumb. That's the only stage where they give you an edge.",
   },
   {
-    title: 'No frameworks with acronyms',
-    body: "If it needs a 40-slide deck and a consultant to explain it, it's not a strategy, it's a hostage situation. We keep it dumb on purpose.",
+    title: 'Honest',
+    body: "Not all dumb ideas work (obviously). When a tactic is so bad it's not worth trying, that's worth calling out too. But feel free to ignore our take.",
   },
   {
-    title: 'Built by someone who does this',
-    body: 'Not a former VP who pivoted to "thought leadership." Actual GTM work, actual opinions, occasionally actually funny.',
+    title: 'Real',
+    body: "We'll cover stories from main character GTM leaders who tried dumb things.",
   },
 ];
 ---
-<BaseLayout title="Home">
+<BaseLayout title="Home" description="DumbGTM celebrates the marketing ideas that get laughed at, and the people behind them.">
   <section class="max-w-5xl mx-auto px-6 pt-16 pb-20">
-    <div class="grid sm:grid-cols-2 gap-10 sm:gap-6 items-center">
+    <div class="grid md:grid-cols-2 gap-10 md:gap-8 items-center">
       <div>
-        <p class="tag mb-6">est. 2026 &middot; contrarian by design</p>
-        <h1 class="font-display font-extrabold text-4xl sm:text-6xl leading-[1.05] max-w-3xl text-ink">
-          Just calling out bad marketing.
+        <p class="tag mb-6">silly. goofy. cheeky. dense. idiotic. moronic. fun.</p>
+        <h1 class="font-display font-extrabold text-5xl sm:text-6xl leading-[1.05] text-ink">
+          So dumb it might work
         </h1>
-        <p class="mt-6 text-lg sm:text-xl max-w-2xl text-ink/80">
-          You can trust us because we have nothing to sell you.
+        <p class="mt-6 text-lg sm:text-xl max-w-xl text-ink/80">
+          DumbGTM celebrates the marketing ideas that get laughed at, and the people behind them.
         </p>
         <div class="mt-8 flex flex-wrap gap-3">
           <a href="/blog" class="btn-solid">Read the blog</a>
-          <a href="/contact" class="btn">Book a session (soon)</a>
+          <SocialButton href={YOUTUBE_URL} label="Watch on YouTube" />
         </div>
       </div>
-      <HeroVisual />
+      <LoopVisual />
     </div>
   </section>
 
-  <section class="bg-ink text-paper">
-    <div class="max-w-5xl mx-auto px-6 py-14 grid sm:grid-cols-3 gap-10">
-      {bits.map((bit) => (
-        <div>
-          <h2 class="font-display font-bold text-xl mb-2">{bit.title}</h2>
-          <p class="text-paper/70 text-sm leading-relaxed">{bit.body}</p>
-        </div>
+  <section class="max-w-5xl mx-auto px-6 pb-20">
+    <h2 class="font-display font-extrabold text-3xl sm:text-4xl text-ink mb-3">The lifecycle of a dumb idea.</h2>
+    <p class="text-lg text-ink/80 max-w-2xl mb-10">
+      Most marketing "gamechangers" go through the same four stages. Then someone comes up with a new dumb idea and it starts over.
+    </p>
+    <ol class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      {STAGE_KEYS.map((key) => (
+        <li class="rounded-xl border border-ink/10 bg-white/40 p-5">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="inline-flex h-7 w-7 items-center justify-center rounded-full font-display font-bold text-sm text-paper" style={`background:${STAGES[key].color}`}>
+              {STAGES[key].n}
+            </span>
+            <h3 class="font-display font-bold text-lg text-ink">{STAGES[key].label}</h3>
+          </div>
+          <p class="text-sm text-ink/75 leading-relaxed">{stageCopy[key]}</p>
+        </li>
       ))}
+    </ol>
+    <p class="mt-8 text-slate italic max-w-2xl">
+      Somewhere, right now, in an open-concept office with many plants and cold brew on tap, a dumb idea is being ignored.
+    </p>
+  </section>
+
+  <section class="bg-ink text-paper">
+    <div class="max-w-5xl mx-auto px-6 py-14">
+      <h2 class="font-display font-extrabold text-2xl sm:text-3xl mb-8">What you'll find here</h2>
+      <div class="grid sm:grid-cols-3 gap-10">
+        {bits.map((bit) => (
+          <div>
+            <h3 class="font-display font-bold text-xl mb-2">{bit.title}</h3>
+            <p class="text-paper/70 text-sm leading-relaxed">{bit.body}</p>
+          </div>
+        ))}
+      </div>
     </div>
   </section>
 
   <section class="max-w-5xl mx-auto px-6 py-16">
     <div class="flex items-baseline justify-between mb-8">
-      <h2 class="font-display font-bold text-2xl sm:text-3xl text-ink">Latest slop we've called out</h2>
+      <h2 class="font-display font-bold text-2xl sm:text-3xl text-ink">New stuff</h2>
       <a href="/blog" class="text-sm text-cerulean underline decoration-2 underline-offset-2 hover:text-siren">
         All posts &rarr;
       </a>
     </div>
 
     {posts.length === 0 ? (
-      <p class="text-slate">First posts are being written. Check back soon.</p>
+      <p class="text-slate">Nothing here yet. Someone is still being laughed at in a meeting.</p>
     ) : (
       <div class="grid sm:grid-cols-3 gap-6">
         {posts.map((post) => (
           <a href={`/blog/${post.slug}`} class="block rounded-xl border border-ink/10 bg-white/40 p-5 hover:bg-frost/20 hover:border-ink/20 transition-colors">
-            <p class="text-xs uppercase tracking-wide text-slate mb-2">
-              {post.data.pubDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+            <p class="text-xs uppercase tracking-wide text-slate mb-3">
+              {post.data.pubDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}
             </p>
+            {post.data.stage && <div class="mb-3"><StageBadge stage={post.data.stage} /></div>}
             <h3 class="font-display font-bold text-lg mb-2 leading-snug text-ink">{post.data.title}</h3>
             <p class="text-sm text-ink/70">{post.data.description}</p>
           </a>
@@ -78,16 +115,16 @@ const bits = [
     )}
   </section>
 
-  <section class="max-w-5xl mx-auto px-6 pb-24">
+  <section class="max-w-5xl mx-auto px-6 pb-8">
     <div class="rounded-2xl bg-frost/20 p-8 sm:p-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
       <div>
-        <h2 class="font-display font-bold text-2xl mb-2 text-ink">Want an hour with someone who's actually done this?</h2>
-        <p class="text-ink/70 max-w-xl">
-          We're building a way to book paid, hourly sessions with real GTM operators &mdash;
-          no retainers, no decks, just answers. Operator sign-ups and booking are coming soon.
-        </p>
+        <h2 class="font-display font-bold text-2xl mb-2 text-ink">Dumb ideas, also in video form</h2>
+        <p class="text-ink/70 max-w-xl">New breakdowns every week on YouTube, and shorter ones on LinkedIn.</p>
       </div>
-      <a href="/contact" class="btn-solid whitespace-nowrap">Get notified</a>
+      <div class="flex flex-wrap gap-3">
+        <SocialButton href={YOUTUBE_URL} label="YouTube" solid />
+        <SocialButton href={LINKEDIN_URL} label="LinkedIn" />
+      </div>
     </div>
   </section>
 </BaseLayout>

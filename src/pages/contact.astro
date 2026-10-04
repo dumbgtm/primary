@@ -1,13 +1,14 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
-<BaseLayout title="Contact" description="Say hi, pitch a rebuttal, or get notified about operator sessions.">
+<BaseLayout title="Contact" description="Send us the marketing idea your team laughed at.">
   <section class="max-w-3xl mx-auto px-6 pt-16 pb-24">
-    <p class="tag mb-6">no chatbots, promise</p>
-    <h1 class="font-display font-extrabold text-3xl sm:text-5xl mb-6 leading-tight text-ink">Say something.</h1>
+    <p class="tag mb-6">a real human reads these</p>
+    <h1 class="font-display font-extrabold text-3xl sm:text-5xl mb-6 leading-tight text-ink">Got a dumb idea?</h1>
     <p class="text-lg mb-10 max-w-xl text-ink/80">
-      Rebuttal to a post, a piece of GTM slop we need to see, or you want first dibs when
-      operator sessions go live — this box handles all of it.
+      Send me the marketing idea your team laughed at. If it's interesting I might write about it
+      or make a video, and only with your OK. I can leave your name and company out. Rebuttals and
+      collab ideas are welcome too.
     </p>
 
     <!--
@@ -36,15 +37,23 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <textarea id="message" name="message" rows="5" required
           class="w-full rounded-lg border border-ink/20 bg-paper px-3 py-2 focus:outline-none focus:ring-2 focus:ring-siren/40 focus:border-siren"></textarea>
       </div>
-      <fieldset class="rounded-xl border border-ink/15 p-4">
-        <legend class="font-display font-semibold text-xs uppercase tracking-wide px-1 text-ink">Notify me about</legend>
-        <label class="flex items-center gap-2 text-sm mb-2 text-ink/80">
-          <input type="checkbox" name="interest" value="operator" class="rounded border-ink/30" />
-          Signing up as a GTM operator
+      <fieldset class="rounded-xl border border-ink/15 p-4 space-y-2">
+        <legend class="font-display font-semibold text-xs uppercase tracking-wide px-1 text-ink">What's this about?</legend>
+        <label class="flex items-center gap-2 text-sm text-ink/80">
+          <input type="checkbox" name="topic" value="idea" class="rounded border-ink/30" />
+          A dumb idea I want to share
         </label>
         <label class="flex items-center gap-2 text-sm text-ink/80">
-          <input type="checkbox" name="interest" value="booking" class="rounded border-ink/30" />
-          Booking a paid session
+          <input type="checkbox" name="topic" value="fired" class="rounded border-ink/30" />
+          I got fired (or ignored) for one too
+        </label>
+        <label class="flex items-center gap-2 text-sm text-ink/80">
+          <input type="checkbox" name="topic" value="rebuttal" class="rounded border-ink/30" />
+          A rebuttal to a post
+        </label>
+        <label class="flex items-center gap-2 text-sm text-ink/80">
+          <input type="checkbox" name="topic" value="collab" class="rounded border-ink/30" />
+          Collab or sponsorship
         </label>
       </fieldset>
       <button type="submit" class="btn-solid">Send it</button>
