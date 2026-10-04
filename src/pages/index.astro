@@ -5,7 +5,6 @@ import Icon from '../components/Icon.astro';
 import MemoHeader from '../components/MemoHeader.astro';
 import MemoList from '../components/MemoList.astro';
 import PaperclipCard from '../components/PaperclipCard.astro';
-import SignatureBlock from '../components/SignatureBlock.astro';
 import SocialButton from '../components/SocialButton.astro';
 import StageBadge from '../components/StageBadge.astro';
 import Stamp from '../components/Stamp.astro';
@@ -36,7 +35,7 @@ const hasSocial = Boolean(YOUTUBE_URL || LINKEDIN_URL);
 <BaseLayout title="Home" description="DumbGTM celebrates the marketing ideas that get laughed at, and the people behind them.">
   <!-- Hero: copy left, Fig. 1 loop chart right (stacks under 900px) -->
   <section class="container-memo pt-12 sm:pt-16 pb-16 sm:pb-24">
-    <div class="grid min-[900px]:grid-cols-[1fr_minmax(0,480px)] gap-12 min-[900px]:gap-14 items-start">
+    <div class="grid min-[900px]:grid-cols-[1fr_minmax(0,480px)] gap-12 min-[900px]:gap-14 items-start min-[900px]:items-center">
       <div class="flex flex-col gap-7 min-w-0">
         <MemoHeader rows={[
           { label: 'TO:', value: 'All Sales, Marketing & Whoever' },
@@ -50,10 +49,6 @@ const hasSocial = Boolean(YOUTUBE_URL || LINKEDIN_URL);
         <div class="flex flex-wrap gap-3">
           <a href="/blog" class="btn-primary">Read the blog<Icon name="arrow-right" size={16} /></a>
           <SocialButton href={YOUTUBE_URL} label="Watch on YouTube" icon="video" />
-        </div>
-        <div class="relative self-start mt-6 pt-10 pr-16 sm:pr-24">
-          <SignatureBlock />
-          <Stamp text="Dumb" italic over="Certified" sub="§1 of 4" rotate={-6} class="absolute top-0 right-0" />
         </div>
       </div>
       <div class="w-full flex justify-center min-[900px]:justify-end">
