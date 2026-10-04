@@ -7,17 +7,10 @@ const blog = defineCollection({
     description: z.string(),
     pubDate: z.date(),
     tags: z.array(z.string()).default([]),
+    // Where the idea sits in the dumb idea loop.
+    stage: z.enum(['dumb', 'working', 'everywhere', 'boring']).optional(),
     draft: z.boolean().default(false),
   }),
 });
 
-const takes = defineCollection({
-  type: 'content',
-  schema: z.object({
-    pubDate: z.date(),
-    tags: z.array(z.string()).default([]),
-    draft: z.boolean().default(false),
-  }),
-});
-
-export const collections = { blog, takes };
+export const collections = { blog };
