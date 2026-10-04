@@ -36,7 +36,4 @@
   .prose-dumb blockquote {
     @apply border-l-4 border-frost pl-4 italic text-slate my-6;
   }
-  .prose-dumb-take p {
-    @apply m-0;
-  }
 }
