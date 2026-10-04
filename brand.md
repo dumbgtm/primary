@@ -40,7 +40,7 @@ Rough coverage: 85% memo, 12% ink, 3% blue + highlighter. Never put blue next to
 | label | Space Mono 400 | 11/1.4, uppercase, 0.06em | `.t-label` |
 | tag | Space Mono 400 | 10, uppercase, 0.06em | `.tag` |
 
-Logo: the word `dumbgtm` in Caslon 700, 18px, lowercase. Text only, no mark. Favicon: see Graphics Kit §07.
+Logo: see **Logo** at the end of this file. Always use the files in `public/brand/`; never retype it.
 
 ## Shape and layout
 - Spacing scale: 4, 8, 12, 16, 24, 32, 48, 64, 96.
@@ -133,7 +133,7 @@ Everything follows the rules above: ink lines, 0 radius, no shadows, no gradient
 - Under 640px: stacked, arrows rotated 90°, return bracket on the right.
 
 ## §06 Share images (`scripts/og-template.html`, 1200x630)
-- Memo background, 64px/72px padding; header row with logo (Caslon 700 36px) left, 2px ink rule, 20px below.
+- Memo background, 64px/72px padding; header row with the wordmark SVG at 44px tall on the left, 2px ink rule, 20px below.
 - Default: "DUMBGTM.COM" right (22px mono); memo header `120px 1fr` at 24px (TO: All Sales, Marketing &
   Whoever / RE: silly. goofy. dense. fun.); "So *dumb* it *might work.*" Caslon 104/1.02 with "dumb"
   highlighted; APPROVED stamp bottom-right (72px right, 56px bottom, -5°, borders 4px/2px, 30px text).
@@ -141,9 +141,8 @@ Everything follows the rules above: ink lines, 0 radius, no shadows, no gradient
   max-width 1000px, punchline half in italics, 3 lines max, 60px over ~90 characters;
   footer "date · dumbgtm.com/blog" 22px muted; FILED stamp bottom-right at 4°.
 
-## §07 Favicon (`public/favicon.svg`)
-A memo sheet: three ink lines with a highlighter bar behind the middle one. Pure geometry. PNGs at 32
-(`favicon-32.png`), 180 (`apple-touch-icon.png`), 192 and 512 (`icon-192.png`, `icon-512.png`).
+## §07 Favicon
+Superseded by the logo handoff below (the "d" mark replaces the memo-sheet favicon).
 
 ## Color additions (Oct 2026, at Ishan's request)
 "A little color" for homepage sections 3 and 4, from the existing palette only:
@@ -163,3 +162,42 @@ A memo sheet: three ink lines with a highlighter bar behind the middle one. Pure
 - No more than one highlight per screen.
 - No long articles set in Space Mono.
 - No third-party icon sets. Use the kit icons (§01) or text glyphs (⚠, §) in Space Mono.
+
+---
+
+# Logo (final, "Highlighted")
+
+_Source: Claude Design handoff "DumbGTM Logo Guidelines" (design_handoff_dumbgtm_logo). Production assets live in `public/brand/` exactly as delivered._
+
+The wordmark is Libre Caslon Text Bold converted to outlines, with a highlighter bar (#F5EE6A) behind "dumb".
+The mark is the "d" on a highlighter square. Wordmark artboard 512x116 (about 4.41:1).
+
+| File | Use |
+|---|---|
+| `dumbgtm-wordmark.svg` | **Primary.** Nav, footer, share images. On memo or white. |
+| `dumbgtm-wordmark-inverse.svg` | On ink backgrounds (transparent bg, "gtm" in memo). Any future dark section. |
+| `dumbgtm-wordmark-inverse-on-ink.svg` | Same with ink background baked in (email, docs, uploads). |
+| `dumbgtm-wordmark-1color.svg` | One colour via currentColor, "dumb" knocked out of a solid bar. Print, stamps. |
+| `dumbgtm-mark.svg` | "d" on highlighter square. App icon, avatar source. |
+| `dumbgtm-mark-on-ink.svg` | Yellow "d" on ink square, for dark UIs. |
+| `dumbgtm-mark-circle.svg` | Circular, only where a transparent round avatar is required. |
+| `/favicon.svg` | 32px mark (site favicon). |
+| `dumbgtm-mark-{16,32,48,180,192,512}.png` | Favicon / PWA / apple-touch-icon sizes. |
+| `dumbgtm-avatar-1080.png` | YouTube, LinkedIn, X profile image (platforms crop to a circle). |
+| `dumbgtm-wordmark-4x.png`, `dumbgtm-wordmark-on-ink-4x.png` | Raster fallbacks where SVG is rejected. |
+
+Placement on the site:
+- Nav: wordmark 22px tall (20px under 640px), linked home, `aria-label="dumbgtm home"`. Same on mobile (never the mark). Keep the 1px ink rule 12px below.
+- Footer: wordmark 28px tall with the tagline below. Footer background is memo (not carbon) so the logo sits on an allowed background.
+- Share images: wordmark 44px tall.
+- Head: `/favicon.svg`, `/brand/dumbgtm-mark-32.png` (32x32), apple-touch-icon `/brand/dumbgtm-mark-180.png`; `site.webmanifest` lists 192 and 512 with background #F5EE6A and theme #FBFAF6.
+
+Rules:
+- Clear space: half the logo's height on every side (the nav rule may sit 12px below).
+- Minimum size: wordmark 80px wide (about 18px tall); mark 16px.
+- Backgrounds: only memo #FBFAF6, white or ink #141414. Never on blue, yellow or photos.
+- Colours: only ink, highlighter and memo.
+- Don't highlight "gtm", recolour the bar, rotate, stretch or add effects. Don't retype the logo in live text.
+- Construction: Caslon Bold at 100 units, default kerning; bar from 0.1em before "d" to 0.1em after "b", 0.9em above
+  the baseline to 0.2em below, square ends, running under the edge of the "g" on purpose; the mark's "d" is 72% of the
+  square's height, optically centred.

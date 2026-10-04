@@ -11,7 +11,9 @@ const isActive = (href: string) => currentPath === href || (href !== '/' && curr
 ---
 <header class="container-memo pt-5">
   <div class="relative flex items-center gap-6 border-b border-ink pb-3">
-    <a href="/" class="font-serif font-bold text-[18px] text-ink lowercase shrink-0">dumbgtm</a>
+    <a href="/" aria-label="dumbgtm home" class="shrink-0 block">
+      <img src="/brand/dumbgtm-wordmark.svg" alt="dumbgtm" width="97" height="22" class="h-5 sm:h-[22px] w-auto block" />
+    </a>
 
     <nav class="ml-auto hidden sm:flex items-center gap-6" aria-label="Main">
       {navItems.map((item) => (

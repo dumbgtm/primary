@@ -25,7 +25,8 @@ npm run preview   # serve the production build locally
 - `tailwind.config.mjs` — brand colors (`memo`, `carbon`, `ink`, `ink2`, `muted`, `staple`, `rule`, `blue`,
   `highlighter`), fonts (`font-serif` Libre Caslon Text, `font-mono` Space Mono), square corners.
 - `brand.md` — full brand guide: palette, type, voice, logo rationale.
-- `public/logo.svg` — wordmark. `public/favicon.svg` (+ PNGs) — memo-sheet favicon.
+- `public/brand/` — official logo files (wordmark variants, mark, PNG sizes, avatar) from the logo handoff.
+  Copy as-is; never retype the logo. `public/favicon.svg` + `public/site.webmanifest` — favicon and app icons.
 - `public/og/` — branded 1200x630 social share images (see "Generating OG share images" below).
 - `scripts/og-template.html` — reusable template used to generate those images.
 

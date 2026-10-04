@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <title>OG template</title>
 <!--
-  dumbGTM share cards, 1200x630 (Graphics Kit §06).
+  dumbGTM share cards, 1200x630 (Graphics Kit §06; logo per the logo handoff, wordmark 44px tall).
   ?mode=default                                        -> og/default.png (APPROVED stamp)
   ?mode=memo&memo=003&stage=4&title=...&italic=...&date=Sep+6,+2026
                                                        -> og/blog/<slug>.png (FILED stamp)
@@ -17,7 +17,7 @@
   html, body { width: 1200px; height: 630px; background: var(--memo); overflow: hidden; color: var(--ink); }
   .canvas { position: relative; width: 1200px; height: 630px; padding: 64px 72px; display: flex; flex-direction: column; }
   .head { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--ink); padding-bottom: 20px; }
-  .logo { font-family: 'Libre Caslon Text', serif; font-weight: 700; font-size: 36px; line-height: 1; }
+  .logo { display: block; height: 44px; width: auto; }
   .right { display: flex; align-items: center; gap: 20px; font-family: 'Space Mono', monospace; font-size: 22px; text-transform: uppercase; letter-spacing: .06em; }
   .stage-tag { display: inline-flex; align-items: center; gap: 10px; border: 2px solid var(--ink); padding: 6px 14px; font-size: 18px; }
   .memo-head { display: grid; grid-template-columns: 120px 1fr; row-gap: 8px; font-family: 'Space Mono', monospace; font-size: 24px; color: var(--muted); margin-top: 36px; }
@@ -45,6 +45,8 @@
   };
   const NAMES = { 1: 'Dumb', 2: 'Working', 3: 'Everywhere', 4: 'Boring' };
   const mark = (n) => `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square">${MARKS[n]}</svg>`;
+  // Official wordmark (logo handoff). Served from the website root: /public/brand/...
+  const LOGO = window.LOGO_SRC || '../public/brand/dumbgtm-wordmark.svg';
   const c = document.getElementById('c');
   if (q.get('mode') === 'memo') {
     const n = q.get('stage');
@@ -53,14 +55,14 @@
     const i = it ? title.lastIndexOf(it) : -1;
     const html = i >= 0 ? esc(title.slice(0, i)) + '<em>' + esc(it) + '</em>' + esc(title.slice(i + it.length)) : esc(title);
     c.innerHTML = `
-      <div class="head"><div class="logo">dumbgtm</div>
+      <div class="head"><img class="logo" src="${LOGO}" alt="dumbgtm">
         <div class="right"><span>Memo ${esc(q.get('memo') || '001')}</span>${n ? `<span class="stage-tag">${mark(n)}§${n} ${NAMES[n]}</span>` : ''}</div></div>
       <div class="title ${title.length > 90 ? 'long' : ''}">${html}</div>
       <div class="foot">${esc(q.get('date') || '')} · dumbgtm.com/blog</div>
       <div class="stamp" style="transform: rotate(4deg)"><span>Filed</span></div>`;
   } else {
     c.innerHTML = `
-      <div class="head"><div class="logo">dumbgtm</div><div class="right">dumbgtm.com</div></div>
+      <div class="head"><img class="logo" src="${LOGO}" alt="dumbgtm"><div class="right">dumbgtm.com</div></div>
       <div class="memo-head"><div>TO:</div><div>All Sales, Marketing &amp; Whoever</div><div>RE:</div><div class="re">silly. goofy. dense. fun.</div></div>
       <div class="display">So <mark>dumb</mark> it <em>might work.</em></div>
       <div class="stamp" style="transform: rotate(-5deg)"><span>Approved</span></div>`;
