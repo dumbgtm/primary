@@ -16,10 +16,7 @@ npm run preview   # serve the production build locally
 
 - `src/content/blog/*.md` — long-form posts. Add a new file here to add a new post
   (frontmatter: `title`, `description`, `pubDate`, `tags`, optional `draft: true` to hide it).
-- `src/content/takes/*.md` — Hot Takes: short, single-idea contrarian one-liners (frontmatter:
-  `pubDate`, `tags`, optional `draft: true`; the take text itself is the markdown body).
-- `src/pages/` — Home, About, Contact, Manifesto, Blog index + post template, Takes index +
-  take template.
+- `src/pages/` — Home, About, Contact, Blog index + post template.
 - `src/components/` — Header, Footer, HeroVisual (animated hero illustration).
 - `src/layouts/BaseLayout.astro` — shared shell, fonts, meta tags, OG/Twitter card tags,
   analytics.
@@ -48,21 +45,6 @@ Body in markdown.
 
 Then generate an OG image for it (see below) at `public/og/blog/my-new-post.png`.
 
-## Publishing a new Hot Take
-
-Add a markdown file to `src/content/takes/`, e.g. `src/content/takes/my-new-take.md`:
-
-```md
----
-pubDate: 2026-08-25
-tags: ["tag-one"]
----
-
-The take itself, one to three sentences, goes here as the body.
-```
-
-Then generate an OG image for it (see below) at `public/og/takes/my-new-take.png`.
-
 Push to the connected branch and Cloudflare rebuilds and redeploys automatically (once
 Workers Builds is connected — see below).
 
@@ -70,21 +52,21 @@ Workers Builds is connected — see below).
 
 Every page has a branded 1200x630 image for link previews (`og:image`/`twitter:image`),
 sourced from `scripts/og-template.html`. It's a static HTML template that takes `kicker`
-(e.g. `HOT TAKE`, `BLOG POST`, `MANIFESTO`) and `text` (the headline/quote) as URL query
+(e.g. `BLOG POST`) and `text` (the headline/quote) as URL query
 params. To generate a new one:
 
 1. Serve the `website/` folder locally (e.g. `python3 -m http.server 8935` from that
    directory) so the template can load its Google Font.
-2. Open `http://localhost:8935/scripts/og-template.html?kicker=HOT+TAKE&text=Your+text+here`
+2. Open `http://localhost:8935/scripts/og-template.html?kicker=BLOG+POST&text=Your+text+here`
    in a browser sized to exactly 1200x630, or screenshot it with headless Chrome:
    ```
    /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
      --headless --disable-gpu --hide-scrollbars --window-size=1200,630 \
-     --screenshot=public/og/takes/my-new-take.png \
-     "http://localhost:8935/scripts/og-template.html?kicker=HOT+TAKE&text=Your+text+here"
+     --screenshot=public/og/blog/my-new-post.png \
+     "http://localhost:8935/scripts/og-template.html?kicker=BLOG+POST&text=Your+text+here"
    ```
-3. Reference it via the page's `ogImage` prop on `<BaseLayout>` (blog and takes pages do
-   this automatically from the slug; other pages set it explicitly, e.g. `manifesto.astro`).
+3. Reference it via the page's `ogImage` prop on `<BaseLayout>` (blog posts do
+   this automatically from the slug; other pages set it explicitly).
 
 This is a manual step for now rather than a build-time step, since it avoids adding an
 image-rendering dependency (satori/resvg, etc.) to the build — worth automating later if
