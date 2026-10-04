@@ -1,0 +1,27 @@
+---
+// Signature pattern: TO / FROM / DATE / RE above every hero and article title.
+interface Row { label: string; value: string }
+interface Props { rows: Row[]; bordered?: boolean; class?: string }
+const { rows, bordered = false, class: extra = '' } = Astro.props;
+---
+<dl class:list={['memo-header', bordered && 'border border-ink p-4', extra]}>
+  {rows.map((r) => (
+    <Fragment>
+      <dt>{r.label}</dt>
+      <dd class:list={[r.label.toUpperCase().startsWith('RE') && 'text-ink']}>{r.value}</dd>
+    </Fragment>
+  ))}
+</dl>
+
+<style>
+  .memo-header {
+    display: grid;
+    grid-template-columns: 70px 1fr;
+    row-gap: 4px;
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+  dt, dd { margin: 0; }
+</style>

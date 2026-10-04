@@ -1,0 +1,8 @@
+---
+interface Props { name: string; subtitle: string; class?: string }
+const { name, subtitle, class: extra = '' } = Astro.props;
+---
+<div class:list={['inline-block border border-ink px-[14px] py-2', extra]}>
+  <p class="font-serif font-bold text-[15px] text-ink leading-tight">{name}</p>
+  <p class="font-mono text-[10px] text-muted mt-0.5">{subtitle}</p>
+</div>

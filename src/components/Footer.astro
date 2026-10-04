@@ -1,16 +1,27 @@
 ---
 const year = new Date().getFullYear();
 ---
-<footer class="border-t border-ink/10 mt-24">
-  <div class="max-w-5xl mx-auto px-6 py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-    <div>
-      <p class="font-display font-extrabold text-lg text-ink lowercase tracking-tight">dumb gtm</p>
-      <p class="text-sm text-slate mt-1">Celebrating dumb marketing ideas.</p>
-    </div>
-    <div class="flex flex-col sm:items-end gap-1 text-sm">
-      <a href="/contact" class="text-ink/70 hover:text-siren">Get in touch</a>
-      <a href="/blog" class="text-ink/70 hover:text-siren">Read the blog</a>
-      <p class="text-slate">&copy; {year} dumbGTM. All rights reserved (mostly for legal reasons, not ego).</p>
+<footer class="mt-16 sm:mt-24 bg-carbon">
+  <div class="container-memo pt-0 pb-10">
+    <div class="double-rule"></div>
+    <div class="pt-6 grid gap-6 sm:grid-cols-[1fr_auto] text-[11px] text-muted font-mono leading-[1.6]">
+      <div>
+        <p class="font-serif font-bold text-[18px] text-ink lowercase mb-1">dumbgtm</p>
+        <p>Celebrating dumb marketing ideas.</p>
+      </div>
+      <div class="sm:text-right space-y-1">
+        <p class="t-label space-x-4">
+          <a href="/blog" class="footer-link">Blog</a>
+          <a href="/about" class="footer-link">About</a>
+          <a href="/contact" class="footer-link">Contact</a>
+        </p>
+        <p>&copy; {year} dumbGTM. This document will self-file in 30 days.</p>
+      </div>
     </div>
   </div>
 </footer>
+
+<style>
+  .footer-link { color: var(--ink); transition: background-color 120ms ease-out; }
+  .footer-link:hover { background: var(--highlighter); }
+</style>

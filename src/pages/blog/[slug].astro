@@ -1,34 +1,48 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import StageBadge from '../../components/StageBadge.astro';
+import MemoHeader from '../../components/MemoHeader.astro';
+import { STAGES } from '../../lib/site';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog', ({ data }) => !data.draft);
-  return posts.map((post) => ({
+  const posts = (await getCollection('blog', ({ data }) => !data.draft))
+    .sort((a, b) => a.data.pubDate.valueOf() - b.data.pubDate.valueOf());
+  return posts.map((post, i) => ({
     params: { slug: post.slug },
-    props: { post },
+    props: { post, n: i + 1 },
   }));
 }
 
-const { post } = Astro.props;
+const { post, n } = Astro.props;
 const { Content } = await post.render();
+const date = post.data.pubDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+const stage = post.data.stage ? STAGES[post.data.stage] : null;
+const rows = [
+  { label: 'MEMO:', value: String(n).padStart(3, '0') },
+  { label: 'TO:', value: 'All readers' },
+  { label: 'FROM:', value: 'dumbGTM' },
+  { label: 'DATE:', value: date },
+  { label: 'RE:', value: stage ? `Stage ${stage.n} of 4: ${stage.label}` : post.data.tags.join(', ') },
+];
 ---
 <BaseLayout title={post.data.title} description={post.data.description} ogImage={`/og/blog/${post.slug}.png`}>
-  <article class="max-w-3xl mx-auto px-6 pt-16 pb-24">
-    <a href="/blog" class="text-sm text-slate hover:text-siren">&larr; All posts</a>
-    <p class="text-xs uppercase tracking-wide text-slate mt-6 mb-2">
-      {post.data.pubDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}
-    </p>
-    <h1 class="font-display font-extrabold text-3xl sm:text-5xl mb-6 leading-tight text-ink">{post.data.title}</h1>
-    {(post.data.stage || post.data.tags.length > 0) && (
-      <div class="flex gap-2 mb-10 flex-wrap items-center">
-        {post.data.stage && <StageBadge stage={post.data.stage} />}
-        {post.data.tags.map((tag) => <span class="tag">{tag}</span>)}
-      </div>
-    )}
-    <div class="prose-dumb text-lg">
+  <article class="container-memo pt-12 sm:pt-16">
+    <a href="/blog" class="link t-label">← All posts</a>
+    <div class="max-w-[68ch] mt-8 flex flex-col gap-7">
+      <MemoHeader rows={rows} bordered />
+      <h1 class="t-h1 text-ink">{post.data.title}</h1>
+      {post.data.tags.length > 0 && (
+        <div class="flex gap-2 flex-wrap">
+          {post.data.tags.map((tag) => <span class="tag">{tag}</span>)}
+        </div>
+      )}
+    </div>
+    <div class="prose-memo mt-10">
       <Content />
+    </div>
+    <div class="max-w-[68ch] mt-12">
+      <div class="double-rule"></div>
+      <p class="t-small pt-4">End of memo. Please do not reply-all.</p>
     </div>
   </article>
 </BaseLayout>

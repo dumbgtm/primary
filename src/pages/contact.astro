@@ -1,67 +1,83 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import MemoHeader from '../components/MemoHeader.astro';
+
+const topics = [
+  { value: 'idea', label: 'A dumb idea I want to share' },
+  { value: 'fired', label: 'I got fired (or ignored) for one too' },
+  { value: 'rebuttal', label: 'A rebuttal to a post' },
+  { value: 'collab', label: 'Collab or sponsorship' },
+];
 ---
 <BaseLayout title="Contact" description="Send us the marketing idea your team laughed at.">
-  <section class="max-w-3xl mx-auto px-6 pt-16 pb-24">
-    <p class="tag mb-6">a real human reads these</p>
-    <h1 class="font-display font-extrabold text-3xl sm:text-5xl mb-6 leading-tight text-ink">Got a dumb idea?</h1>
-    <p class="text-lg mb-10 max-w-xl text-ink/80">
-      Send me the marketing idea your team laughed at. If it's interesting I might write about it
-      or make a video, and only with your OK. I can leave your name and company out. Rebuttals and
-      collab ideas are welcome too.
-    </p>
+  <section class="container-memo pt-12 sm:pt-16">
+    <div class="max-w-[640px] flex flex-col gap-7">
+      <MemoHeader rows={[
+        { label: 'TO:', value: 'You' },
+        { label: 'FROM:', value: 'dumbGTM' },
+        { label: 'RE:', value: 'A real human reads these' },
+      ]} />
+      <h1 class="t-h1 text-ink">Got a dumb idea?</h1>
+      <p class="t-body-mono">
+        Send me the marketing idea your team laughed at. If it's interesting I might write about it
+        or make a video, and only with your OK. I can leave your name and company out. Rebuttals and
+        collab ideas are welcome too.
+      </p>
 
-    <!--
-      Wire this form to Formspree (or any form backend) before launch:
-      1. Create a free form at https://formspree.io
-      2. Replace YOUR_FORM_ID below with the endpoint they give you.
-      Until then this form won't actually send anywhere.
-    -->
-    <form
-      action="https://formspree.io/f/YOUR_FORM_ID"
-      method="POST"
-      class="space-y-5 rounded-2xl border border-ink/10 bg-white/40 p-6 sm:p-8"
-    >
-      <div>
-        <label for="name" class="block font-display font-semibold text-xs uppercase tracking-wide mb-1 text-ink">Name</label>
-        <input id="name" name="name" type="text" required
-          class="w-full rounded-lg border border-ink/20 bg-paper px-3 py-2 focus:outline-none focus:ring-2 focus:ring-siren/40 focus:border-siren" />
-      </div>
-      <div>
-        <label for="email" class="block font-display font-semibold text-xs uppercase tracking-wide mb-1 text-ink">Email</label>
-        <input id="email" name="email" type="email" required
-          class="w-full rounded-lg border border-ink/20 bg-paper px-3 py-2 focus:outline-none focus:ring-2 focus:ring-siren/40 focus:border-siren" />
-      </div>
-      <div>
-        <label for="message" class="block font-display font-semibold text-xs uppercase tracking-wide mb-1 text-ink">Message</label>
-        <textarea id="message" name="message" rows="5" required
-          class="w-full rounded-lg border border-ink/20 bg-paper px-3 py-2 focus:outline-none focus:ring-2 focus:ring-siren/40 focus:border-siren"></textarea>
-      </div>
-      <fieldset class="rounded-xl border border-ink/15 p-4 space-y-2">
-        <legend class="font-display font-semibold text-xs uppercase tracking-wide px-1 text-ink">What's this about?</legend>
-        <label class="flex items-center gap-2 text-sm text-ink/80">
-          <input type="checkbox" name="topic" value="idea" class="rounded border-ink/30" />
-          A dumb idea I want to share
-        </label>
-        <label class="flex items-center gap-2 text-sm text-ink/80">
-          <input type="checkbox" name="topic" value="fired" class="rounded border-ink/30" />
-          I got fired (or ignored) for one too
-        </label>
-        <label class="flex items-center gap-2 text-sm text-ink/80">
-          <input type="checkbox" name="topic" value="rebuttal" class="rounded border-ink/30" />
-          A rebuttal to a post
-        </label>
-        <label class="flex items-center gap-2 text-sm text-ink/80">
-          <input type="checkbox" name="topic" value="collab" class="rounded border-ink/30" />
-          Collab or sponsorship
-        </label>
-      </fieldset>
-      <button type="submit" class="btn-solid">Send it</button>
-    </form>
+      <!--
+        Wire this form to Formspree (or any form backend) before launch:
+        1. Create a free form at https://formspree.io
+        2. Replace YOUR_FORM_ID below with the endpoint they give you.
+        Until then this form won't actually send anywhere.
+      -->
+      <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST" class="border border-ink p-5 sm:p-8 flex flex-col gap-6">
+        <p class="t-label text-muted border-b border-rule pb-3">Form DG-1: Idea submission</p>
+        <div>
+          <label for="name" class="t-label text-ink block mb-2">Name</label>
+          <input id="name" name="name" type="text" required class="field" />
+        </div>
+        <div>
+          <label for="email" class="t-label text-ink block mb-2">Email</label>
+          <input id="email" name="email" type="email" required class="field" />
+        </div>
+        <div>
+          <label for="message" class="t-label text-ink block mb-2">Message</label>
+          <textarea id="message" name="message" rows="5" required class="field resize-y"></textarea>
+        </div>
+        <fieldset class="border border-ink p-4">
+          <legend class="t-label text-ink px-1">What's this about?</legend>
+          <div class="flex flex-col gap-3 mt-1">
+            {topics.map((t) => (
+              <label class="flex items-start gap-3 font-mono text-[14px] text-ink2 leading-[1.5] cursor-pointer">
+                <input type="checkbox" name="topic" value={t.value} class="check mt-[3px]" />
+                {t.label}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+        <div>
+          <button type="submit" class="btn-primary">Send it →</button>
+        </div>
+      </form>
 
-    <p class="mt-8 text-sm text-slate">
-      Prefer email? <a href="mailto:hello@dumbgtm.com" class="text-cerulean underline decoration-2 underline-offset-2 hover:text-siren">hello@dumbgtm.com</a>
-      (forwarding to be set up in Cloudflare — see project README).
-    </p>
+      <p class="t-small">
+        Prefer email? <a href="mailto:hello@dumbgtm.com" class="link">hello@dumbgtm.com</a>
+      </p>
+    </div>
   </section>
 </BaseLayout>
+
+<style>
+  .check {
+    appearance: none;
+    width: 16px; height: 16px;
+    flex: none;
+    border: 1px solid var(--ink);
+    background: var(--carbon);
+    display: inline-grid;
+    place-content: center;
+  }
+  .check::before { content: ''; width: 8px; height: 8px; background: var(--ink); transform: scale(0); transition: transform 120ms ease-out; }
+  .check:checked::before { transform: scale(1); }
+  .check:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+</style>

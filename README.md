@@ -17,12 +17,12 @@ npm run preview   # serve the production build locally
 - `src/content/blog/*.md` — long-form posts. Add a new file here to add a new post
   (frontmatter: `title`, `description`, `pubDate`, `tags`, optional `draft: true` to hide it).
 - `src/pages/` — Home, About, Contact, Blog index + post template.
-- `src/components/` — Header, Footer, HeroVisual (animated hero illustration).
+- `src/components/` — Header, Footer, MemoHeader, MemoList, SignatureBlock, StageBadge, SocialButton, LoopVisual (Fig. 1, the dumb idea loop).
 - `src/layouts/BaseLayout.astro` — shared shell, fonts, meta tags, OG/Twitter card tags,
   analytics.
-- `src/styles/global.css` — Tailwind + brand utility classes (`.btn`, `.tag`, `.prose-dumb`).
-- `tailwind.config.mjs` — brand colors (`paper`, `ink`, `siren`, `frost`, `cerulean`, `slate`)
-  and fonts (`font-display`, `font-body`).
+- `src/styles/global.css` — Tailwind + brand tokens and utility classes (`.btn-primary`, `.tag`, `.prose-memo`, ...).
+- `tailwind.config.mjs` — brand colors (`memo`, `carbon`, `ink`, `ink2`, `muted`, `staple`, `rule`, `blue`,
+  `highlighter`), fonts (`font-serif` Libre Caslon Text, `font-mono` Space Mono), square corners.
 - `brand.md` — full brand guide: palette, type, voice, logo rationale.
 - `public/logo.svg`, `public/logo-stamp.svg` — wordmark and stamp/favicon mark.
 - `public/og/` — branded 1200x630 social share images (see "Generating OG share images" below).

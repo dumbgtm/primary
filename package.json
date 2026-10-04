@@ -1,23 +1,23 @@
 {
-      "name": "dumbgtm",
-      "type": "module",
-      "version": "0.1.0",
-      "scripts": {
-              "dev": "astro dev",
-              "start": "astro dev",
-              "build": "astro build",
-              "preview": "astro preview",
-              "deploy": "wrangler deploy"
-      },
-      "dependencies": {
-              "@astrojs/tailwind": "^5.1.2",
-              "@astrojs/rss": "^4.0.9",
-              "@fontsource/inter": "^5.1.0",
-              "@fontsource/inter-tight": "^5.1.0",
-              "astro": "^4.16.7",
-              "tailwindcss": "^3.4.14"
-      },
-      "devDependencies": {
-              "wrangler": "^4.4.0"
-      }
+  "name": "dumbgtm",
+  "type": "module",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.9",
+    "@astrojs/tailwind": "^5.1.2",
+    "@fontsource/libre-caslon-text": "^5.1.0",
+    "@fontsource/space-mono": "^5.1.0",
+    "astro": "^4.16.7",
+    "tailwindcss": "^3.4.14"
+  },
+  "devDependencies": {
+    "wrangler": "^4.4.0"
+  }
 }

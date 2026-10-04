@@ -1,78 +1,60 @@
 ---
-// The dumb idea loop: four stops on a ring, a dot travelling clockwise.
-// The dot fades from Siren to Slate as the idea gets copied, sits at Slate
-// through "boring", then turns red again when the next dumb idea shows up.
+// Fig. 1: the dumb idea loop. Four stops on a ring, an ink dot travelling
+// clockwise. Each stop inverts (ink fill, memo text) while the dot is there.
 import { STAGES } from '../lib/site';
 
 const cx = 200, cy = 200, r = 140;
 const stops = [
-  { key: 'dumb', x: cx, y: cy - r, w: 76 },
-  { key: 'working', x: cx + r, y: cy, w: 96 },
-  { key: 'everywhere', x: cx, y: cy + r, w: 120 },
-  { key: 'boring', x: cx - r, y: cy, w: 88 },
+  { key: 'dumb', x: cx, y: cy - r, w: 84 },
+  { key: 'working', x: cx + r, y: cy, w: 104 },
+  { key: 'everywhere', x: cx, y: cy + r, w: 128 },
+  { key: 'boring', x: cx - r, y: cy, w: 96 },
 ] as const;
 
-// Ring segments, each starting in its stage colour.
 const pt = (deg: number) => {
   const a = (deg * Math.PI) / 180;
   return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
 };
-const arcs = [-90, 0, 90, 180].map((start, i) => {
-  const [x1, y1] = pt(start);
-  const [x2, y2] = pt(start + 90);
-  return { d: `M${x1},${y1} A${r},${r} 0 0 1 ${x2},${y2}`, color: STAGES[stops[i].key].color };
-});
-// Direction arrows at the middle of each segment.
-const arrows = [-45, 45, 135, 225].map((deg, i) => {
+const arrows = [-45, 45, 135, 225].map((deg) => {
   const [x, y] = pt(deg);
-  return { x, y, rot: deg + 90, color: STAGES[stops[i].key].color };
+  return { x, y, rot: deg + 90 };
 });
-
-const c = stops.map((s) => STAGES[s.key].color);
 const path = `M${cx},${cy - r} A${r},${r} 0 0 1 ${cx},${cy + r} A${r},${r} 0 0 1 ${cx},${cy - r}`;
-const dotColors = [c[0], c[1], c[2], c[3], c[3], c[0]].join(';');
 ---
-<figure class="loop-visual rounded-2xl bg-frost/15 border border-ink/10 p-6 sm:p-8">
-  <svg viewBox="0 0 400 400" class="w-full h-auto max-w-md mx-auto" role="img"
+<figure class="loop border border-ink p-4 sm:p-6 bg-memo">
+  <figcaption class="t-label text-muted flex justify-between gap-4 border-b border-rule pb-3 mb-2">
+    <span>Fig. 1: The dumb idea loop</span>
+    <span aria-hidden="true">§1–§4</span>
+  </figcaption>
+  <svg viewBox="0 0 400 400" class="w-full h-auto max-w-[420px] mx-auto block" role="img"
     aria-label="The dumb idea loop: dumb, then working, then everywhere, then boring, then a new dumb idea starts it again.">
-    {arcs.map((a) => (
-      <path d={a.d} fill="none" stroke={a.color} stroke-opacity="0.35" stroke-width="6" stroke-linecap="round" />
-    ))}
+    <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--ink)" stroke-width="1" />
     {arrows.map((a) => (
-      <polygon points="-6,-7 8,0 -6,7" fill={a.color} fill-opacity="0.6"
-        transform={`translate(${a.x} ${a.y}) rotate(${a.rot})`} />
+      <polygon points="-5,-5 6,0 -5,5" fill="var(--ink)" transform={`translate(${a.x} ${a.y}) rotate(${a.rot})`} />
     ))}
 
-    <text x={cx} y={cy + 5} text-anchor="middle" class="font-display font-bold fill-slate" font-size="15" letter-spacing="1.5">REPEAT</text>
+    <text x={cx} y={cy - 4} text-anchor="middle" font-family="'Space Mono', monospace" font-size="11" letter-spacing="0.66" fill="var(--muted)">REPEAT</text>
+    <text x={cx} y={cy + 14} text-anchor="middle" font-family="'Space Mono', monospace" font-size="11" fill="var(--muted)">↻</text>
 
-    <g>
-      <circle r="17" fill={c[0]} fill-opacity="0.18">
-        <animateMotion dur="10s" repeatCount="indefinite" path={path} />
-        <animate attributeName="fill" dur="10s" repeatCount="indefinite" values={dotColors} keyTimes="0;0.25;0.5;0.75;0.96;1" />
-      </circle>
-    </g>
-
-    <circle r="8" fill={c[0]} stroke="#E9FFF9" stroke-width="3">
+    <circle r="6" fill="var(--ink)">
       <animateMotion dur="10s" repeatCount="indefinite" path={path} />
-      <animate attributeName="fill" dur="10s" repeatCount="indefinite" values={dotColors} keyTimes="0;0.25;0.5;0.75;0.96;1" />
     </circle>
 
     {stops.map((s, i) => (
-      <g class={`stop stop-${i}`} style={`transform-origin:${s.x}px ${s.y}px`}>
-        <rect x={s.x - s.w / 2} y={s.y - 17} width={s.w} height="34" rx="17" fill={STAGES[s.key].color} />
-        <text x={s.x} y={s.y + 5} text-anchor="middle" class="font-display font-bold fill-paper" font-size="14">
-          {STAGES[s.key].label.toLowerCase()}
+      <g class={`stop stop-${i}`}>
+        <rect x={s.x - s.w / 2} y={s.y - 15} width={s.w} height="30" stroke="var(--ink)" stroke-width="1" />
+        <text x={s.x} y={s.y + 4} text-anchor="middle" font-family="'Space Mono', monospace" font-size="11" letter-spacing="0.66">
+          §{STAGES[s.key].n} {STAGES[s.key].label.toUpperCase()}
         </text>
       </g>
     ))}
-
   </svg>
 </figure>
 
 <script>
-  // SMIL animations ignore CSS, so pause them for people who prefer less motion.
+  // SMIL ignores CSS, so pause it for people who prefer less motion.
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    document.querySelectorAll<SVGSVGElement>('.loop-visual svg').forEach((svg) => {
+    document.querySelectorAll<SVGSVGElement>('.loop svg').forEach((svg) => {
       svg.pauseAnimations();
       svg.setCurrentTime(0);
     });
@@ -80,16 +62,24 @@ const dotColors = [c[0], c[1], c[2], c[3], c[3], c[0]].join(';');
 </script>
 
 <style>
-  .loop-visual svg { overflow: visible; }
-  .stop { animation: stop-pulse 10s ease-out infinite; }
-  .stop-1 { animation-delay: 2.5s; }
-  .stop-2 { animation-delay: 5s; }
-  .stop-3 { animation-delay: 7.5s; }
-  @keyframes stop-pulse {
-    0% { transform: scale(1.14); }
-    10%, 100% { transform: scale(1); }
+  .stop rect { fill: var(--memo); animation: stop-fill 10s linear infinite; }
+  .stop text { fill: var(--ink); animation: stop-text 10s linear infinite; }
+  /* Centre each inversion on the moment the dot arrives (every 2.5s). */
+  .stop-0 rect, .stop-0 text { animation-delay: -0.7s; }
+  .stop-1 rect, .stop-1 text { animation-delay: 1.8s; }
+  .stop-2 rect, .stop-2 text { animation-delay: 4.3s; }
+  .stop-3 rect, .stop-3 text { animation-delay: 6.8s; }
+  @keyframes stop-fill {
+    0%, 14% { fill: var(--ink); }
+    15%, 100% { fill: var(--memo); }
+  }
+  @keyframes stop-text {
+    0%, 14% { fill: var(--memo); }
+    15%, 100% { fill: var(--ink); }
   }
   @media (prefers-reduced-motion: reduce) {
-    .stop { animation: none; }
+    .stop rect, .stop text { animation: none; }
+    .stop-0 rect { fill: var(--ink); }
+    .stop-0 text { fill: var(--memo); }
   }
 </style>

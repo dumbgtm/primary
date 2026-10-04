@@ -2,38 +2,104 @@
 @tailwind components;
 @tailwind utilities;
 
+/* dumbGTM "HR Memo" tokens. See brand.md. */
+:root {
+  --memo: #FBFAF6;        /* page bg, default surface */
+  --carbon: #F3F1EA;      /* alt surface: inputs, row hover, footer */
+  --ink: #141414;         /* text, 1px rules, borders, inverse bg */
+  --ink-2: #3D3D39;       /* body copy */
+  --muted: #5C5C56;       /* meta, labels, captions */
+  --staple: #9A9A96;      /* decorative only, never text */
+  --rule: #DAD8D0;        /* hairlines inside lists */
+  --blue: #1F4FB8;        /* primary actions + links ONLY */
+  --blue-hover: #173D8F;
+  --highlighter: #F5EE6A; /* emphasis, max 1 per view */
+}
+
 @layer base {
+  html { -webkit-text-size-adjust: 100%; }
   body {
-    background-color: #E9FFF9;
+    background: var(--memo);
+    color: var(--ink);
+    font-family: 'Space Mono', ui-monospace, monospace;
+  }
+  ::selection { background: var(--highlighter); color: var(--ink); }
+  :focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  mark {
+    background: var(--highlighter);
+    color: var(--ink);
+    padding: 0 4px;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
   }
 }
 
 @layer components {
-  .tag {
-    @apply inline-block rounded-full bg-frost/30 px-3 py-1 text-xs uppercase tracking-wide text-ink;
+  /* Layout */
+  .container-memo { @apply mx-auto w-full max-w-container px-5 sm:px-8; }
+  .section { @apply py-16 sm:py-24; }
+  .double-rule { border-top: 1px solid var(--ink); padding-top: 2px; }
+  .double-rule::before { content: ''; display: block; border-top: 1px solid var(--ink); }
+
+  /* Type scale */
+  .t-display { @apply font-serif font-normal; font-size: clamp(40px, 6vw, 72px); line-height: 1.04; letter-spacing: -0.01em; }
+  .t-display mark { padding: 0 6px; }
+  .t-h1 { @apply font-serif font-normal text-[34px] sm:text-[48px]; line-height: 1.08; }
+  .t-h2 { @apply font-serif font-normal text-[26px] sm:text-[32px]; line-height: 1.15; }
+  .t-h3 { @apply font-serif font-bold text-[22px]; line-height: 1.25; }
+  .t-body-mono { @apply font-mono text-[14px] text-ink2; line-height: 1.6; }
+  .t-small { @apply font-mono text-[12px] text-muted; line-height: 1.6; }
+  .t-label { @apply font-mono text-[11px] uppercase; line-height: 1.4; letter-spacing: 0.06em; }
+
+  /* Buttons */
+  .btn-primary {
+    @apply inline-flex items-center justify-center bg-blue font-mono font-bold text-[12px] text-memo px-[18px] py-[14px] sm:px-4 sm:py-3 min-h-[44px] sm:min-h-0;
+    transition: background-color 120ms ease-out, color 120ms ease-out;
   }
-  .btn {
-    @apply inline-block rounded-lg border border-ink/20 px-5 py-2.5 font-display font-semibold text-sm text-ink bg-paper transition-colors duration-150 hover:border-ink/40 hover:bg-ink/5;
+  .btn-primary:hover { background: var(--blue-hover); }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center border border-ink font-mono font-bold text-[12px] text-ink px-[18px] py-[13px] sm:px-4 sm:py-[11px] min-h-[44px] sm:min-h-0;
+    transition: background-color 120ms ease-out, color 120ms ease-out;
   }
-  .btn-solid {
-    @apply inline-block rounded-lg px-5 py-2.5 font-display font-semibold text-sm text-paper bg-siren transition-colors duration-150 hover:bg-siren/90;
+  .btn-secondary:hover { background: var(--ink); color: var(--memo); }
+  .btn-disabled {
+    @apply inline-flex items-center justify-center border border-staple font-mono font-bold text-[12px] text-muted px-[18px] py-[13px] sm:px-4 sm:py-[11px] min-h-[44px] sm:min-h-0 cursor-default;
   }
-  .prose-dumb a {
-    @apply text-cerulean underline decoration-2 underline-offset-2 hover:text-siren;
+
+  /* Links */
+  .link {
+    color: var(--blue);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: background-color 120ms ease-out, color 120ms ease-out;
   }
-  .prose-dumb h2 {
-    @apply font-display font-bold text-2xl mt-10 mb-3;
+  .link:hover { color: var(--ink); background: var(--highlighter); }
+
+  /* Tags */
+  .tag { @apply inline-block font-mono text-[10px] uppercase px-2 py-[3px] border border-ink text-ink; letter-spacing: 0.06em; line-height: 1.4; }
+  .tag-inverse { @apply inline-block font-mono text-[10px] uppercase px-2 py-[3px] bg-ink text-memo border border-ink; letter-spacing: 0.06em; line-height: 1.4; }
+  .tag-highlighter { @apply inline-block font-mono text-[10px] uppercase px-2 py-[3px] bg-highlighter text-ink; letter-spacing: 0.06em; line-height: 1.4; }
+
+  /* Form fields */
+  .field {
+    @apply w-full bg-carbon border border-ink font-mono text-[14px] text-ink px-3 py-[11px];
+    transition: background-color 120ms ease-out;
   }
-  .prose-dumb h3 {
-    @apply font-display font-bold text-xl mt-8 mb-2;
-  }
-  .prose-dumb p {
-    @apply mb-5 leading-relaxed;
-  }
-  .prose-dumb ul {
-    @apply list-disc pl-6 mb-5 space-y-1;
-  }
-  .prose-dumb blockquote {
-    @apply border-l-4 border-frost pl-4 italic text-slate my-6;
-  }
+  .field:focus { outline: none; background: var(--memo); box-shadow: inset 0 0 0 1px var(--blue); }
+  .field:focus-visible { outline: none; }
+
+  /* Long-form article body */
+  .prose-memo { @apply font-serif text-ink2 text-[19px]; line-height: 1.65; max-width: 68ch; }
+  .prose-memo p { @apply mb-6; }
+  .prose-memo h2 { @apply font-serif font-normal text-ink text-[26px] sm:text-[32px] mt-12 mb-4; line-height: 1.15; }
+  .prose-memo h3 { @apply font-serif font-bold text-ink text-[22px] mt-10 mb-3; line-height: 1.25; }
+  .prose-memo a { color: var(--blue); text-decoration: underline; text-underline-offset: 3px; transition: background-color 120ms ease-out, color 120ms ease-out; }
+  .prose-memo a:hover { color: var(--ink); background: var(--highlighter); }
+  .prose-memo ul { @apply list-disc pl-6 mb-6 space-y-2; }
+  .prose-memo ol { @apply list-decimal pl-6 mb-6 space-y-2; }
+  .prose-memo blockquote { @apply border-l border-ink pl-5 italic text-ink my-8; }
+  .prose-memo strong { @apply text-ink font-bold; }
 }

@@ -1,14 +1,16 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import LoopVisual from '../components/LoopVisual.astro';
-import StageBadge from '../components/StageBadge.astro';
+import MemoHeader from '../components/MemoHeader.astro';
+import MemoList from '../components/MemoList.astro';
+import SignatureBlock from '../components/SignatureBlock.astro';
 import SocialButton from '../components/SocialButton.astro';
 import { getCollection } from 'astro:content';
 import { STAGES, STAGE_KEYS, YOUTUBE_URL, LINKEDIN_URL } from '../lib/site';
 
-const posts = (await getCollection('blog', ({ data }) => !data.draft))
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-  .slice(0, 3);
+const all = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => a.data.pubDate.valueOf() - b.data.pubDate.valueOf());
+const posts = all.map((p, i) => ({ post: p, n: i + 1 })).reverse().slice(0, 3);
 
 const stageCopy = {
   dumb: 'Someone suggests something contrarian. Nobody smart is doing anything like it. Maybe not your best idea, try again.',
@@ -18,111 +20,101 @@ const stageCopy = {
 };
 
 const bits = [
-  {
-    title: 'Early',
-    body: "We write about ideas while they still sound dumb. That's the only stage where they give you an edge.",
-  },
-  {
-    title: 'Honest',
-    body: "Not all dumb ideas work (obviously). When a tactic is so bad it's not worth trying, that's worth calling out too. But feel free to ignore our take.",
-  },
-  {
-    title: 'Real',
-    body: "We'll cover stories from main character GTM leaders who tried dumb things.",
-  },
+  { title: 'Early', body: "We write about ideas while they still sound dumb. That's the only stage where they give you an edge." },
+  { title: 'Honest', body: "Not all dumb ideas work (obviously). When a tactic is so bad it's not worth trying, that's worth calling out too. But feel free to ignore our take." },
+  { title: 'Real', body: "We'll cover stories from main character GTM leaders who tried dumb things." },
 ];
 ---
 <BaseLayout title="Home" description="DumbGTM celebrates the marketing ideas that get laughed at, and the people behind them.">
-  <section class="max-w-5xl mx-auto px-6 pt-16 pb-20">
-    <div class="grid md:grid-cols-2 gap-10 md:gap-8 items-center">
-      <div>
-        <p class="tag mb-6">silly. goofy. cheeky. dense. idiotic. moronic. fun.</p>
-        <h1 class="font-display font-extrabold text-5xl sm:text-6xl leading-[1.05] text-ink">
-          So dumb it might work
-        </h1>
-        <p class="mt-6 text-lg sm:text-xl max-w-xl text-ink/80">
+  <!-- Hero -->
+  <section class="container-memo pt-12 sm:pt-16 pb-16 sm:pb-24">
+    <div class="grid md:grid-cols-[1.15fr_1fr] gap-12 md:gap-10 items-start">
+      <div class="flex flex-col gap-7">
+        <MemoHeader rows={[
+          { label: 'TO:', value: 'All Sales, Marketing & Whoever' },
+          { label: 'FROM:', value: 'dumbGTM' },
+          { label: 'RE:', value: 'silly. goofy. cheeky. dense. idiotic. moronic. fun.' },
+        ]} />
+        <h1 class="t-display text-ink">So <mark>dumb</mark> it <em>might work.</em></h1>
+        <p class="t-body-mono max-w-[46ch]">
           DumbGTM celebrates the marketing ideas that get laughed at, and the people behind them.
         </p>
-        <div class="mt-8 flex flex-wrap gap-3">
-          <a href="/blog" class="btn-solid">Read the blog</a>
+        <div class="flex flex-wrap gap-3">
+          <a href="/blog" class="btn-primary">Read the blog →</a>
           <SocialButton href={YOUTUBE_URL} label="Watch on YouTube" />
         </div>
+        <SignatureBlock name="The Author" subtitle="Name withheld. Feelings: on file." class="self-end" />
       </div>
       <LoopVisual />
     </div>
   </section>
 
-  <section class="max-w-5xl mx-auto px-6 pb-20">
-    <h2 class="font-display font-extrabold text-3xl sm:text-4xl text-ink mb-3">The lifecycle of a dumb idea.</h2>
-    <p class="text-lg text-ink/80 max-w-2xl mb-10">
-      Most marketing "gamechangers" go through the same four stages. Then someone comes up with a new dumb idea and it starts over.
-    </p>
-    <ol class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-      {STAGE_KEYS.map((key) => (
-        <li class="rounded-xl border border-ink/10 bg-white/40 p-5">
-          <div class="flex items-center gap-2 mb-3">
-            <span class="inline-flex h-7 w-7 items-center justify-center rounded-full font-display font-bold text-sm text-paper" style={`background:${STAGES[key].color}`}>
-              {STAGES[key].n}
-            </span>
-            <h3 class="font-display font-bold text-lg text-ink">{STAGES[key].label}</h3>
-          </div>
-          <p class="text-sm text-ink/75 leading-relaxed">{stageCopy[key]}</p>
-        </li>
-      ))}
-    </ol>
-    <p class="mt-8 text-slate italic max-w-2xl">
-      Somewhere, right now, in an open-concept office with many plants and cold brew on tap, a dumb idea is being ignored.
-    </p>
+  <!-- The loop -->
+  <section class="container-memo pb-16 sm:pb-24">
+    <div class="border-t border-ink pt-10">
+      <p class="t-label text-muted mb-3">Section 1</p>
+      <h2 class="t-h1 text-ink mb-4">The lifecycle of a dumb idea.</h2>
+      <p class="t-body-mono max-w-[60ch] mb-10">
+        Most marketing "gamechangers" go through the same four stages. Then someone comes up with a new dumb idea and it starts over.
+      </p>
+      <ol class="grid sm:grid-cols-2 lg:grid-cols-4 border-t border-l border-ink">
+        {STAGE_KEYS.map((key) => (
+          <li class="border-r border-b border-ink p-5 sm:p-6">
+            <p class="t-label text-muted mb-3">§{STAGES[key].n} of 4</p>
+            <h3 class="t-h3 text-ink mb-3">{STAGES[key].label}</h3>
+            <p class="t-body-mono text-[13px]">{stageCopy[key]}</p>
+          </li>
+        ))}
+      </ol>
+      <p class="font-serif italic text-[19px] leading-[1.5] text-ink2 mt-8 max-w-[56ch]">
+        Somewhere, right now, in an open-concept office with many plants and cold brew on tap, a dumb idea is being ignored.
+      </p>
+    </div>
   </section>
 
-  <section class="bg-ink text-paper">
-    <div class="max-w-5xl mx-auto px-6 py-14">
-      <h2 class="font-display font-extrabold text-2xl sm:text-3xl mb-8">What you'll find here</h2>
-      <div class="grid sm:grid-cols-3 gap-10">
-        {bits.map((bit) => (
-          <div>
-            <h3 class="font-display font-bold text-xl mb-2">{bit.title}</h3>
-            <p class="text-paper/70 text-sm leading-relaxed">{bit.body}</p>
+  <!-- What you'll find here -->
+  <section class="bg-ink text-memo">
+    <div class="container-memo py-16 sm:py-24">
+      <p class="t-label text-staple mb-3">Section 2</p>
+      <h2 class="t-h1 mb-10">What you'll find here</h2>
+      <div class="grid sm:grid-cols-3 gap-10 sm:gap-8">
+        {bits.map((bit, i) => (
+          <div class="border-t border-memo/40 pt-5">
+            <p class="t-label text-staple mb-2">2.{i + 1}</p>
+            <h3 class="font-serif font-bold text-[22px] leading-[1.25] mb-2">{bit.title}</h3>
+            <p class="font-mono text-[14px] leading-[1.6] text-memo/80">{bit.body}</p>
           </div>
         ))}
       </div>
     </div>
   </section>
 
-  <section class="max-w-5xl mx-auto px-6 py-16">
-    <div class="flex items-baseline justify-between mb-8">
-      <h2 class="font-display font-bold text-2xl sm:text-3xl text-ink">New stuff</h2>
-      <a href="/blog" class="text-sm text-cerulean underline decoration-2 underline-offset-2 hover:text-siren">
-        All posts &rarr;
-      </a>
+  <!-- New stuff -->
+  <section class="container-memo py-16 sm:py-24">
+    <div class="flex items-baseline justify-between gap-4 mb-6">
+      <div>
+        <p class="t-label text-muted mb-3">Section 3</p>
+        <h2 class="t-h1 text-ink">New stuff</h2>
+      </div>
+      <a href="/blog" class="link t-label">All posts →</a>
     </div>
-
     {posts.length === 0 ? (
-      <p class="text-slate">Nothing here yet. Someone is still being laughed at in a meeting.</p>
+      <p class="t-small">Nothing here yet. Someone is still being laughed at in a meeting.</p>
     ) : (
-      <div class="grid sm:grid-cols-3 gap-6">
-        {posts.map((post) => (
-          <a href={`/blog/${post.slug}`} class="block rounded-xl border border-ink/10 bg-white/40 p-5 hover:bg-frost/20 hover:border-ink/20 transition-colors">
-            <p class="text-xs uppercase tracking-wide text-slate mb-3">
-              {post.data.pubDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}
-            </p>
-            {post.data.stage && <div class="mb-3"><StageBadge stage={post.data.stage} /></div>}
-            <h3 class="font-display font-bold text-lg mb-2 leading-snug text-ink">{post.data.title}</h3>
-            <p class="text-sm text-ink/70">{post.data.description}</p>
-          </a>
-        ))}
-      </div>
+      <MemoList items={posts} />
     )}
   </section>
 
-  <section class="max-w-5xl mx-auto px-6 pb-8">
-    <div class="rounded-2xl bg-frost/20 p-8 sm:p-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+  <!-- Video -->
+  <section class="container-memo pb-8">
+    <div class="border border-ink p-6 sm:p-10 grid sm:grid-cols-[1fr_auto] gap-6 items-center">
       <div>
-        <h2 class="font-display font-bold text-2xl mb-2 text-ink">Dumb ideas, also in video form</h2>
-        <p class="text-ink/70 max-w-xl">New breakdowns every week on YouTube, and shorter ones on LinkedIn.</p>
+        <p class="t-label text-muted mb-3">Section 4</p>
+        <h2 class="t-h2 text-ink mb-2">Dumb ideas, also in video form</h2>
+        <p class="t-body-mono">New breakdowns every week on YouTube, and shorter ones on LinkedIn.</p>
       </div>
       <div class="flex flex-wrap gap-3">
-        <SocialButton href={YOUTUBE_URL} label="YouTube" solid />
+        <SocialButton href={YOUTUBE_URL} label="YouTube" primary />
         <SocialButton href={LINKEDIN_URL} label="LinkedIn" />
       </div>
     </div>

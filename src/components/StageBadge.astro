@@ -3,7 +3,4 @@ import { STAGES, type Stage } from '../lib/site';
 interface Props { stage: Stage }
 const s = STAGES[Astro.props.stage];
 ---
-<span class="inline-flex items-center gap-1.5 rounded-full border border-ink/10 bg-white/60 px-2.5 py-0.5 text-xs font-display font-semibold text-ink">
-  <span class="inline-block h-2 w-2 rounded-full" style={`background:${s.color}`}></span>
-  Stage {s.n} · {s.label}
-</span>
+<span class="tag">§{s.n} {s.label}</span>

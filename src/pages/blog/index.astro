@@ -1,53 +1,45 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import StageBadge from '../../components/StageBadge.astro';
+import MemoHeader from '../../components/MemoHeader.astro';
+import MemoList from '../../components/MemoList.astro';
 import { getCollection } from 'astro:content';
 import { STAGES, STAGE_KEYS } from '../../lib/site';
 
-const posts = (await getCollection('blog', ({ data }) => !data.draft))
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const all = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => a.data.pubDate.valueOf() - b.data.pubDate.valueOf());
+const items = all.map((p, i) => ({ post: p, n: i + 1 })).reverse();
 ---
 <BaseLayout title="Blog" description="Contrarian marketing ideas, the ones that work and the ones everybody copied until they stopped working.">
-  <section class="max-w-3xl mx-auto px-6 pt-16 pb-24">
-    <p class="tag mb-6">new dumb ideas, roughly weekly</p>
-    <h1 class="font-display font-extrabold text-3xl sm:text-5xl mb-5 leading-tight text-ink">The Blog</h1>
-    <p class="text-lg text-ink/80 mb-8">
-      Marketing ideas at every stage of the loop. Some are early and weird. Some used to work and have been run into the ground. Every post says which stage it thinks the idea is in.
-    </p>
+  <section class="container-memo pt-12 sm:pt-16 pb-8">
+    <div class="max-w-[760px] flex flex-col gap-7">
+      <MemoHeader rows={[
+        { label: 'TO:', value: 'All readers' },
+        { label: 'FROM:', value: 'dumbGTM' },
+        { label: 'RE:', value: 'New dumb ideas, roughly weekly' },
+      ]} />
+      <h1 class="t-h1 text-ink">The Blog</h1>
+      <p class="t-body-mono max-w-[60ch]">
+        Marketing ideas at every stage of the loop. Some are early and weird. Some used to work and have been run into the ground. Every post says which stage it thinks the idea is in.
+      </p>
+    </div>
+  </section>
 
-    {posts.length === 0 ? (
-      <p class="text-slate">Nothing here yet. Someone is still being laughed at in a meeting.</p>
+  <section class="container-memo pb-8">
+    {items.length === 0 ? (
+      <p class="t-small">Nothing here yet. Someone is still being laughed at in a meeting.</p>
     ) : (
       <>
-        <div class="flex flex-wrap gap-2 mb-8" role="group" aria-label="Filter by loop stage">
+        <div class="flex flex-wrap items-center gap-2 mb-6" role="group" aria-label="Filter by loop stage">
+          <span class="t-label text-muted mr-2">Filter:</span>
           <button type="button" data-filter="all" aria-pressed="true" class="stage-filter">All</button>
           {STAGE_KEYS.map((key) => (
             <button type="button" data-filter={key} aria-pressed="false" class="stage-filter">
-              <span class="inline-block h-2 w-2 rounded-full" style={`background:${STAGES[key].color}`}></span>
-              {STAGES[key].label}
+              §{STAGES[key].n} {STAGES[key].label}
             </button>
           ))}
         </div>
-        <div class="space-y-6" id="post-list">
-          {posts.map((post) => (
-            <a href={`/blog/${post.slug}`} data-stage={post.data.stage ?? ''} class="post-card block rounded-xl border border-ink/10 bg-white/40 p-6 hover:bg-frost/20 hover:border-ink/20 transition-colors">
-              <div class="flex flex-wrap items-center gap-3 mb-2">
-                <p class="text-xs uppercase tracking-wide text-slate">
-                  {post.data.pubDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}
-                </p>
-                {post.data.stage && <StageBadge stage={post.data.stage} />}
-              </div>
-              <h2 class="font-display font-bold text-2xl mb-2 leading-snug text-ink">{post.data.title}</h2>
-              <p class="text-ink/70">{post.data.description}</p>
-              {post.data.tags.length > 0 && (
-                <div class="flex gap-2 mt-4 flex-wrap">
-                  {post.data.tags.map((tag) => <span class="tag">{tag}</span>)}
-                </div>
-              )}
-            </a>
-          ))}
-          <p id="no-posts" class="hidden text-slate">No posts at this stage yet. Give it a quarter.</p>
-        </div>
+        <MemoList items={items} filterable />
+        <p id="no-posts" class="hidden t-small py-6">No posts at this stage yet. Give it a quarter.</p>
       </>
     )}
   </section>
@@ -55,16 +47,16 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
 
 <script>
   const buttons = document.querySelectorAll<HTMLButtonElement>('.stage-filter');
-  const cards = document.querySelectorAll<HTMLElement>('.post-card');
+  const rows = document.querySelectorAll<HTMLElement>('.memo-row');
   const empty = document.getElementById('no-posts');
   buttons.forEach((btn) => {
     btn.addEventListener('click', () => {
       const f = btn.dataset.filter;
       buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
       let shown = 0;
-      cards.forEach((card) => {
-        const show = f === 'all' || card.dataset.stage === f;
-        card.classList.toggle('hidden', !show);
+      rows.forEach((row) => {
+        const show = f === 'all' || row.dataset.stage === f;
+        row.classList.toggle('hidden', !show);
         if (show) shown++;
       });
       empty?.classList.toggle('hidden', shown > 0);
@@ -74,9 +66,16 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
 
 <style>
   .stage-filter {
-    @apply inline-flex items-center gap-1.5 rounded-full border border-ink/15 bg-paper px-3 py-1.5 font-display text-sm font-semibold text-ink/70 transition-colors hover:border-ink/40 hover:text-ink;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 6px 10px;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+    background: var(--memo);
+    transition: background-color 120ms ease-out, color 120ms ease-out;
   }
-  .stage-filter[aria-pressed='true'] {
-    @apply border-ink bg-ink text-paper;
-  }
+  .stage-filter:hover { background: var(--carbon); }
+  .stage-filter[aria-pressed='true'] { background: var(--ink); color: var(--memo); }
 </style>
