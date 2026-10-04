@@ -1,0 +1,9 @@
+---
+interface Props { href: string; label: string; solid?: boolean }
+const { href, label, solid = false } = Astro.props;
+---
+{href ? (
+  <a href={href} target="_blank" rel="noopener" class={solid ? 'btn-solid' : 'btn'}>{label}</a>
+) : (
+  <span class="btn opacity-60 cursor-default hover:bg-paper hover:border-ink/20" title="Channel launching soon">{label} (soon)</span>
+)}
