@@ -2,7 +2,7 @@
 import Icon from './Icon.astro';
 const navItems = [
   { href: '/', label: 'Home' },
-  { href: '/dumb-ideas', label: 'Dumb Ideas' },
+  { href: '/dumb-ideas', label: 'Dumb Ideas', strong: true },
   { href: '/blog', label: 'Blog' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
@@ -19,7 +19,7 @@ const isActive = (href: string) => currentPath === href || (href !== '/' && curr
     <nav class="ml-auto hidden sm:flex items-center gap-6" aria-label="Main">
       {navItems.map((item) => (
         <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}
-          class:list={['nav-link t-label whitespace-nowrap px-1 py-1', isActive(item.href) && 'nav-active']}>
+          class:list={['nav-link t-label whitespace-nowrap px-1 py-1', item.strong && 'font-bold', isActive(item.href) && 'nav-active']}>
           {item.label}
         </a>
       ))}
@@ -33,7 +33,7 @@ const isActive = (href: string) => currentPath === href || (href !== '/' && curr
     <nav id="mobile-nav" class="mobile-nav hidden sm:hidden absolute left-0 right-0 top-full z-20 bg-memo border-b border-ink" aria-label="Main">
       {navItems.map((item) => (
         <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}
-          class:list={['nav-link t-label block px-1 py-4 border-t border-rule', isActive(item.href) && 'nav-active']}>
+          class:list={['nav-link t-label block px-1 py-4 border-t border-rule', item.strong && 'font-bold', isActive(item.href) && 'nav-active']}>
           {item.label}
         </a>
       ))}
