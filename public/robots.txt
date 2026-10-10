@@ -1,3 +1,4 @@
 User-agent: *
 Allow: /
-Sitemap: https://dumbgtm.com/sitemap.xml
+
+Sitemap: https://www.dumbgtm.com/sitemap-index.xml

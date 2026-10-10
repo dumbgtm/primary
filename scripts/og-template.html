@@ -5,6 +5,8 @@
 <title>OG template</title>
 <!--
   dumbGTM share cards, 1200x630 (Graphics Kit §06; logo per the logo handoff, wordmark 44px tall).
+  ?mode=memo&...&fig=AI+SDRs                            -> same card with a mini Fig. 1 loop chart on the right,
+                                                          marker on the post's stage, labelled with `fig`
   ?mode=default                                        -> og/default.png (APPROVED stamp)
   ?mode=memo&memo=003&stage=4&title=...&italic=...&date=Sep+6,+2026
                                                        -> og/blog/<slug>.png (FILED stamp)
@@ -28,6 +30,13 @@
     display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
   .title.long { font-size: 60px; }
   .foot { margin-top: auto; font-family: 'Space Mono', monospace; font-size: 22px; color: var(--muted); }
+  .body { display: flex; gap: 48px; align-items: flex-start; margin-top: 40px; }
+  .body .title { margin-top: 0; font-size: 60px; max-width: 600px; -webkit-line-clamp: 4; }
+  .body .title.long { font-size: 52px; }
+  .fig { flex: 0 0 420px; border: 2px solid var(--ink); background: #fff; }
+  .fig-head { display: flex; justify-content: space-between; font-family: 'Space Mono', monospace; font-size: 14px; text-transform: uppercase; letter-spacing: .06em; padding: 10px 14px; border-bottom: 1px solid var(--ink); }
+  .fig svg { display: block; width: 100%; height: auto; }
+  .fig-cap { font-family: 'Libre Caslon Text', serif; font-style: italic; font-size: 17px; line-height: 1.3; color: var(--ink-2); padding: 2px 16px 14px; }
   .stamp { position: absolute; right: 72px; bottom: 56px; border: 4px solid var(--ink); padding: 5px; opacity: .85; mix-blend-mode: multiply; }
   .stamp span { display: block; border: 2px solid var(--ink); padding: 10px 24px; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 30px; letter-spacing: .12em; text-transform: uppercase; line-height: 1; }
 </style>
@@ -47,6 +56,29 @@
   const mark = (n) => `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square">${MARKS[n]}</svg>`;
   // Official wordmark (logo handoff). Served from the website root: /public/brand/...
   const LOGO = window.LOGO_SRC || '../public/brand/dumbgtm-wordmark.svg';
+  // Mini "Fig. 1: The dumb idea loop" (same geometry as src/lib/loop.ts), with a marker on stage n.
+  function loopFig(n, label) {
+    const RES = [[30,236],[122,230],[140,205],[215,72],[240,50],[268,54],[300,84],[340,98],[400,100]];
+    const EVR = [[30,246],[150,246],[200,200],[260,96],[300,80],[340,98],[400,100]];
+    const HEAD = { 1: [76,233], 2: [180,135], 3: [268,54], 4: [360,99] }[n];
+    const pts = (a) => a.map((p) => p.join(',')).join(' ');
+    const Z = [30,122.5,215,307.5,400];
+    const zl = [0,1,2,3].map((i) => `<text x="${(Z[i]+Z[i+1])/2}" y="272" text-anchor="middle" font-family="Space Mono" font-size="11" letter-spacing="1" fill="${i+1===n?'#141414':'#5C5C56'}" font-weight="${i+1===n?700:400}">§${i+1}</text>`).join('');
+    const zr = [1,2,3].map((i) => `<line x1="${Z[i]}" y1="20" x2="${Z[i]}" y2="250" stroke="#DAD8D0"/>`).join('');
+    const lw = esc(label).length * 8.4 + 20;
+    const lx = Math.min(Math.max(HEAD[0], lw/2 + 34), 404 - lw/2);
+    return `<div class="fig"><div class="fig-head"><span>Fig. 1: The dumb idea loop</span><span>§1–§4 ↻</span></div>
+      <svg viewBox="0 0 410 290">${zr}${zl}
+        <polyline points="30,14 30,250 404,250" fill="none" stroke="#141414" stroke-width="1.5"/>
+        <text x="36" y="26" font-family="Space Mono" font-size="11" fill="#5C5C56" letter-spacing="1">RESULTS</text>
+        <polyline points="${pts(EVR)}" fill="none" stroke="#9A9A96" stroke-width="1.5" stroke-dasharray="5 5"/>
+        <polyline points="${pts(RES)}" fill="none" stroke="#141414" stroke-width="3"/>
+        <circle cx="${HEAD[0]}" cy="${HEAD[1]}" r="8" fill="#F5EE6A" stroke="#141414" stroke-width="2"/>
+        <rect x="${lx - lw/2}" y="${HEAD[1] + 16}" width="${lw}" height="22" fill="#141414"/>
+        <text x="${lx}" y="${HEAD[1] + 31}" text-anchor="middle" font-family="Space Mono" font-size="12" font-weight="700" letter-spacing="1" fill="#FBFAF6">${esc(label).toUpperCase()}</text>
+      </svg>
+      <div class="fig-cap">${esc(q.get('caption') || 'Results flatten once everyone copies it.')}</div></div>`;
+  }
   const c = document.getElementById('c');
   if (q.get('mode') === 'memo') {
     const n = q.get('stage');
@@ -54,12 +86,14 @@
     const it = q.get('italic') || '';
     const i = it ? title.lastIndexOf(it) : -1;
     const html = i >= 0 ? esc(title.slice(0, i)) + '<em>' + esc(it) + '</em>' + esc(title.slice(i + it.length)) : esc(title);
+    const fig = q.get('fig');
+    const titleHtml = `<div class="title ${title.length > (fig ? 70 : 90) ? 'long' : ''}">${html}</div>`;
     c.innerHTML = `
       <div class="head"><img class="logo" src="${LOGO}" alt="dumbgtm">
         <div class="right"><span>Memo ${esc(q.get('memo') || '001')}</span>${n ? `<span class="stage-tag">${mark(n)}§${n} ${NAMES[n]}</span>` : ''}</div></div>
-      <div class="title ${title.length > 90 ? 'long' : ''}">${html}</div>
+      ${fig ? `<div class="body">${titleHtml}${loopFig(Number(n) || 3, fig)}</div>` : titleHtml}
       <div class="foot">${esc(q.get('date') || '')} · dumbgtm.com/blog</div>
-      <div class="stamp" style="transform: rotate(4deg)"><span>Filed</span></div>`;
+      <div class="stamp" style="transform: rotate(4deg)${fig ? '; right: 560px; bottom: 128px' : ''}"><span>Filed</span></div>`;
   } else {
     c.innerHTML = `
       <div class="head"><img class="logo" src="${LOGO}" alt="dumbgtm"><div class="right">dumbgtm.com</div></div>

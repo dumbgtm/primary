@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.9",
+    "@astrojs/sitemap": "^3.2.1",
     "@astrojs/tailwind": "^5.1.2",
     "@fontsource/libre-caslon-text": "^5.1.0",
     "@fontsource/space-mono": "^5.1.0",

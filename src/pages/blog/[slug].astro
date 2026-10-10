@@ -21,6 +21,44 @@ const { post, n } = Astro.props;
 const { Content } = await post.render();
 const date = post.data.pubDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 const stage = post.data.stage ? STAGES[post.data.stage] : null;
+const pageUrl = new URL(`/blog/${post.slug}/`, Astro.site).href;
+const imageUrl = new URL(`/og/blog/${post.slug}.png`, Astro.site).href;
+const org = { '@type': 'Organization', name: 'dumbGTM', url: 'https://www.dumbgtm.com/' };
+const jsonLd: Record<string, unknown>[] = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.data.title,
+    description: post.data.description,
+    datePublished: post.data.pubDate.toISOString(),
+    dateModified: (post.data.updatedDate ?? post.data.pubDate).toISOString(),
+    image: imageUrl,
+    url: pageUrl,
+    mainEntityOfPage: pageUrl,
+    author: org,
+    publisher: { ...org, logo: { '@type': 'ImageObject', url: 'https://www.dumbgtm.com/brand/dumbgtm-mark-512.png' } },
+    keywords: post.data.tags.join(', '),
+    wordCount: post.body.split(/\s+/).filter(Boolean).length,
+    ...(post.data.sources.length && {
+      citation: post.data.sources.map((s) => ({ '@type': 'CreativeWork', name: s.title, url: s.url, ...(s.publisher && { publisher: s.publisher }) })),
+    }),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Blog', item: 'https://www.dumbgtm.com/blog/' },
+      { '@type': 'ListItem', position: 2, name: post.data.title, item: pageUrl },
+    ],
+  },
+];
+if (post.data.faq.length) {
+  jsonLd.push({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: post.data.faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+  });
+}
 const rows = [
   { label: 'MEMO:', value: String(n).padStart(3, '0') },
   { label: 'TO:', value: 'All readers' },
@@ -29,7 +67,8 @@ const rows = [
   { label: 'RE:', value: stage ? `Stage ${stage.n} of 4: ${stage.label}` : post.data.tags.join(', ') },
 ];
 ---
-<BaseLayout title={post.data.title} description={post.data.description} ogImage={`/og/blog/${post.slug}.png`}>
+<BaseLayout title={post.data.title} description={post.data.description} ogImage={`/og/blog/${post.slug}.png`} ogType="article">
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   <article class="container-memo pt-12 sm:pt-16">
     <a href="/blog" class="link t-label inline-flex items-center gap-[6px]"><Icon name="arrow-right" size={16} class="rotate-180" />All posts</a>
     <div class="mt-8">
@@ -45,6 +84,30 @@ const rows = [
         </div>
         <div class="prose-memo mt-10">
           <Content />
+          {post.data.faq.length > 0 && (
+            <section aria-labelledby="faq">
+              <h2 id="faq">Frequently asked questions</h2>
+              {post.data.faq.map((f) => (
+                <Fragment>
+                  <h3>{f.q}</h3>
+                  <p>{f.a}</p>
+                </Fragment>
+              ))}
+            </section>
+          )}
+          {post.data.sources.length > 0 && (
+            <section aria-labelledby="sources" class="sources">
+              <h2 id="sources">Sources</h2>
+              <ol>
+                {post.data.sources.map((s) => (
+                  <li>
+                    <a href={s.url} rel="noopener">{s.title}</a>
+                    {(s.publisher || s.date) && <span class="sources-meta">{[s.publisher, s.date].filter(Boolean).join(', ')}</span>}
+                  </li>
+                ))}
+              </ol>
+            </section>
+          )}
         </div>
         <div class="max-w-[68ch] mt-12 pb-4">
           <div class="double-rule"></div>
