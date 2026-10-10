@@ -23,7 +23,7 @@ const d = idea.data;
 const total = slideCount(idea.body);
 const date = d.pubDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 const stage = d.stage ? STAGES[d.stage] : null;
-const ogImage = existsSync(`public/og/ideas/${idea.slug}.png`) ? `/og/ideas/${idea.slug}.png` : '/og/default.png';
+const ogImage = existsSync(`public/og/ideas/${idea.slug}.png`) ? `/og/ideas/${idea.slug}.png` : (idea.data.cover ?? '/og/default.png');
 const pageUrl = new URL(`/dumb-ideas/${idea.slug}/`, Astro.site).href;
 const org = { '@type': 'Organization', name: 'dumbGTM', url: 'https://www.dumbgtm.com/' };
 const jsonLd: Record<string, unknown>[] = [
@@ -34,7 +34,7 @@ const jsonLd: Record<string, unknown>[] = [
     description: d.description,
     datePublished: d.pubDate.toISOString(),
     dateModified: (d.updatedDate ?? d.pubDate).toISOString(),
-    image: new URL(d.cover ?? ogImage, Astro.site).href,
+    image: new URL(ogImage, Astro.site).href,
     url: pageUrl,
     mainEntityOfPage: pageUrl,
     author: org,
@@ -67,7 +67,7 @@ const rows = [
   { label: 'RE:', value: stage ? `Stage ${stage.n} of 4: ${stage.label}` : d.tags.join(', ') },
 ];
 ---
-<BaseLayout title={d.title} description={d.description} ogImage={d.cover ?? ogImage} ogType="article">
+<BaseLayout title={d.title} description={d.description} ogImage={ogImage} ogType="article">
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   <article class="container-memo pt-12 sm:pt-16 pb-16">
     <a href="/dumb-ideas" class="link t-label inline-flex items-center gap-[6px]"><Icon name="arrow-right" size={16} class="rotate-180" />All dumb ideas</a>

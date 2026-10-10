@@ -3,6 +3,7 @@ title: "Marketing and war: three generals, three GTM moves"
 description: "What Fabius, Operation Uranus and Moltke can teach a GTM team: pick your fights, hit both flanks at once, and give your team the intent instead of a script."
 pubDate: 2026-10-10
 tags: ["strategy", "competition", "sales"]
+cover: "/ideas/marketing-and-war/slide-1.png"
 sources:
   - title: "Fabian strategy"
     publisher: "Wikipedia"
