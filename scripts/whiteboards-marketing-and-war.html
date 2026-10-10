@@ -1,0 +1,225 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Kalam;font-weight:400;src:url(node_modules/@fontsource/kalam/files/kalam-latin-400-normal.woff2)}
+@font-face{font-family:Kalam;font-weight:700;src:url(node_modules/@fontsource/kalam/files/kalam-latin-700-normal.woff2)}
+html,body{margin:0;background:#fff}
+svg{display:block}
+text{font-family:Kalam}
+</style></head>
+<body>
+<svg id="s" width="1200" height="900" viewBox="0 0 1200 900"></svg>
+<script type="module">
+import rough from './node_modules/roughjs/bundled/rough.esm.js';
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('s');
+const rc = rough.svg(svg);
+const INK = '#1d1d1f', GREY = '#8a8a86', GHOST = '#eeeeea', YEL = '#F5EE6A';
+let seed = 1; const S = () => (seed = (seed * 9301 + 49297) % 233280) || 1;
+const add = (n) => svg.appendChild(n);
+const el = (tag, attrs) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; };
+const txt = (x, y, s, o = {}) => {
+  const t = el('text', { x, y, 'font-size': o.size || 30, fill: o.color || INK });
+  if (o.bold) t.setAttribute('font-weight', 700);
+  if (o.anchor) t.setAttribute('text-anchor', o.anchor);
+  if (o.rotate) t.setAttribute('transform', `rotate(${o.rotate} ${x} ${y})`);
+  t.textContent = s; add(t); return t;
+};
+const line = (x1, y1, x2, y2, o = {}) => add(rc.line(x1, y1, x2, y2, { stroke: o.color || INK, strokeWidth: o.w || 3, roughness: o.r ?? 1.2, seed: S(), strokeLineDash: o.dash }));
+const curve = (pts, o = {}) => add(rc.curve(pts, { stroke: o.color || INK, strokeWidth: o.w || 3, roughness: o.r ?? 1.1, seed: S(), strokeLineDash: o.dash }));
+const head = (a, b, o = {}) => {
+  const ang = Math.atan2(b[1] - a[1], b[0] - a[0]), L = o.L || 22;
+  for (const d of [0.45, -0.45]) line(b[0], b[1], b[0] - L * Math.cos(ang + d), b[1] - L * Math.sin(ang + d), { color: o.color, w: o.w || 3, r: 0.8 });
+};
+const arrow = (pts, o = {}) => { curve(pts, o); head(pts[pts.length - 2], pts[pts.length - 1], o); };
+const rect = (x, y, w, h, o = {}) => add(rc.rectangle(x, y, w, h, { stroke: o.color || INK, strokeWidth: o.w || 3, roughness: o.r ?? 1.1, seed: S(), fill: o.fill, fillStyle: o.fillStyle || 'hachure', hachureGap: o.gap || 9, fillWeight: o.fw || 1.6 }));
+const circle = (x, y, d, o = {}) => add(rc.circle(x, y, d, { stroke: o.color || INK, strokeWidth: o.w || 3, roughness: o.r ?? 1.1, seed: S(), fill: o.fill, fillStyle: o.fillStyle || 'hachure', hachureGap: o.gap || 9 }));
+const ellipse = (x, y, w, h, o = {}) => add(rc.ellipse(x, y, w, h, { stroke: o.color || INK, strokeWidth: o.w || 3, roughness: o.r ?? 1.1, seed: S(), fill: o.fill, fillStyle: o.fillStyle || 'hachure', hachureGap: o.gap || 9 }));
+const poly = (pts, o = {}) => add(rc.polygon(pts, { stroke: o.color || INK, strokeWidth: o.w || 3, roughness: o.r ?? 1.1, seed: S(), fill: o.fill, fillStyle: o.fillStyle || 'hachure', hachureGap: o.gap || 9 }));
+// highlighter stroke behind text (draw first)
+const hi = (x, y, w, h = 34) => add(rc.rectangle(x, y, w, h, { stroke: 'none', fill: YEL, fillStyle: 'solid', roughness: 1.6, seed: S() }));
+const underline = (x, y, w) => line(x, y, x + w, y - 3, { w: 3, r: 1.4 });
+const person = (x, y, s = 1) => { circle(x, y - 46 * s, 34 * s, { w: 3 }); curve([[x - 30 * s, y + 18 * s], [x - 22 * s, y - 16 * s], [x, y - 24 * s], [x + 22 * s, y - 16 * s], [x + 30 * s, y + 18 * s]], { w: 3 }); };
+const hills = (x, y, n, w = 70) => { for (let i = 0; i < n; i++) curve([[x + i * w, y], [x + i * w + w / 2, y - 40], [x + (i + 1) * w, y]], { color: GREY, w: 2.5 }); };
+const star = (x, y, r = 26, o = {}) => { const p = []; for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.45 : r; p.push([x + rr * Math.cos(a), y + rr * Math.sin(a)]); } poly(p, { fill: o.fill || YEL, fillStyle: 'solid', w: 2.5 }); };
+
+// ---- the board itself: white surface, aluminium frame, tray with a marker and eraser ----
+function frame() {
+  add(el('rect', { x: 0, y: 0, width: 1200, height: 900, fill: '#e7e8ea' }));
+  add(el('rect', { x: 14, y: 14, width: 1172, height: 842, fill: '#cfd2d6' }));
+  add(el('rect', { x: 24, y: 24, width: 1152, height: 822, fill: '#fcfcfb' }));
+  // ghosting from an old, half-erased board
+  line(140, 760, 470, 735, { color: GHOST, w: 10, r: 2 });
+  ellipse(1000, 120, 210, 64, { color: GHOST, w: 7, r: 2.4 });
+  line(620, 70, 760, 104, { color: GHOST, w: 7, r: 2 });
+  // tray
+  add(el('rect', { x: 14, y: 856, width: 1172, height: 30, fill: '#c3c6cb' }));
+  add(el('rect', { x: 14, y: 856, width: 1172, height: 5, fill: '#aeb2b7' }));
+  add(el('rect', { x: 880, y: 862, width: 150, height: 16, rx: 4, fill: '#222' }));
+  add(el('rect', { x: 1030, y: 865, width: 20, height: 10, rx: 2, fill: '#555' }));
+  add(el('rect', { x: 700, y: 858, width: 120, height: 22, fill: '#3b3b3b' }));
+  add(el('rect', { x: 700, y: 874, width: 120, height: 6, fill: '#bdbdbd' }));
+}
+const title = (s, sub) => { txt(70, 100, s, { size: 54, bold: true }); underline(70, 116, Math.min(1000, s.length * 26)); if (sub) txt(72, 160, sub, { size: 32, color: GREY }); };
+
+const boards = {
+  1() {
+    title('War → GTM', 'three battles, three moves');
+    // crossed-out quote poster
+    rect(800, 56, 330, 124, { w: 2.5, color: GREY });
+    txt(965, 106, '"Know your enemy..."', { size: 30, anchor: 'middle', color: GREY });
+    txt(965, 146, 'every LinkedIn post', { size: 24, anchor: 'middle', color: GREY });
+    line(790, 120, 1140, 116, { w: 5 });
+    const cols = [[230, '217 BC', 'Fabius', 'pick your fights'], [600, '1942', 'Uranus', 'hit both flanks'], [970, '1866', 'Moltke', 'intent > script']];
+    cols.forEach(([x, yr, name, move], i) => {
+      rect(x - 150, 250, 300, 300, { w: 3 });
+      txt(x, 296, yr, { size: 30, anchor: 'middle', color: GREY });
+      if (i === 0) { hills(x - 120, 470, 3, 80); rect(x - 30, 395, 60, 34, { fill: INK, gap: 6 }); ellipse(x - 70, 510, 90, 36, { fill: GREY, color: GREY }); }
+      if (i === 1) { circle(x + 40, 420, 90, { fill: GREY, color: GREY }); arrow([[x - 110, 320], [x - 60, 360], [x - 12, 400]], { w: 4 }); arrow([[x - 110, 520], [x - 60, 480], [x - 12, 442]], { w: 4 }); }
+      if (i === 2) { rect(x - 90, 350, 180, 140, { w: 2.5 }); for (let k = 0; k < 3; k++) line(x - 70, 385 + k * 34, x + 60 - k * 20, 385 + k * 34, { w: 2.5 }); }
+      txt(x, 612, name, { size: 40, bold: true, anchor: 'middle' });
+    });
+    hi(445, 660, 310, 44);
+    cols.forEach(([x, , , move]) => txt(x, 692, move, { size: 32, anchor: 'middle' }));
+  },
+  2() {
+    title('Fabius, 217 BC', 'shadow the big army, never give it a battle');
+    hills(120, 330, 13, 76);
+    txt(1070, 300, 'hills', { size: 28, color: GREY, anchor: 'end' });
+    // Hannibal's army wandering, short on supplies
+    curve([[110, 640], [260, 560], [420, 640], [600, 560], [780, 650], [960, 570]], { color: GREY, w: 3, dash: [12, 10] });
+    ellipse(1010, 560, 190, 110, { fill: GREY, color: GREY });
+    txt(1010, 645, 'Hannibal', { size: 30, anchor: 'middle', bold: true, color: GREY });
+    // Roman force on the high ground
+    rect(905, 360, 100, 52, { fill: INK, gap: 6 });
+    txt(955, 448, 'Rome', { size: 32, anchor: 'middle', bold: true });
+    curve([[150, 400], [400, 380], [650, 400], [900, 385]], { w: 2.5, dash: [4, 12] });
+    // picked-off foraging parties
+    [[330, 600], [560, 590], [760, 615]].forEach(([x, y]) => { line(x - 14, y - 14, x + 14, y + 14, { w: 4 }); line(x + 14, y - 14, x - 14, y + 14, { w: 4 }); });
+    txt(560, 700, 'foraging parties, picked off', { size: 32, anchor: 'middle' });
+    hi(120, 752, 520, 46);
+    txt(130, 786, 'Cunctator = "the Delayer"', { size: 36, bold: true });
+    txt(660, 786, '(meant as an insult)', { size: 32, color: GREY });
+  },
+  3() {
+    title('Their ground vs. yours', 'don\'t take the pitched battle');
+    circle(600, 470, 420, { fill: '#c9c9c5', color: GREY, gap: 18 });
+    txt(600, 400, 'INCUMBENT', { size: 40, bold: true, anchor: 'middle' });
+    ['head keywords', 'enterprise RFPs', 'feature checklists', 'the big booth'].forEach((s, i) => txt(600, 448 + i * 38, s, { size: 30, anchor: 'middle' }));
+    // a head-on arrow, crossed out
+    arrow([[150, 470], [340, 470]], { w: 4 });
+    line(215, 430, 285, 510, { w: 5 }); line(285, 430, 215, 510, { w: 5 });
+    txt(90, 560, 'head-on', { size: 30, color: GREY });
+    // small wins around the edges
+    const flag = (x, y, s) => { line(x, y, x, y - 70, { w: 3 }); poly([[x, y - 70], [x + 46, y - 56], [x, y - 42]], { fill: INK, fillStyle: 'solid', w: 2 }); txt(x + 10, y + 32, s, { size: 29 }); };
+    flag(840, 300, 'a segment they ignore');
+    flag(870, 520, 'a use case too small');
+    flag(820, 720, 'a channel they won\'t touch');
+    hi(780, 770, 330, 42);
+    txt(790, 800, 'win small fights', { size: 34, bold: true });
+  },
+  4() {
+    title('Operation Uranus, Nov 1942', 'skip the city, hit the flanks');
+    // Volga
+    curve([[1010, 170], [990, 330], [1030, 500], [995, 680], [1020, 820]], { color: GREY, w: 4 });
+    txt(1045, 250, 'Volga', { size: 28, color: GREY });
+    // the city + 6th Army
+    circle(860, 480, 170, { fill: GREY, color: INK, gap: 10 });
+    txt(860, 600, 'Stalingrad', { size: 32, anchor: 'middle', bold: true });
+    txt(860, 488, '6th Army', { size: 28, anchor: 'middle' });
+    // thin Romanian flanks
+    line(780, 400, 420, 300, { color: GREY, w: 3, dash: [6, 8] });
+    line(790, 560, 470, 690, { color: GREY, w: 3, dash: [6, 8] });
+    txt(620, 300, 'Romanian 3rd', { size: 28, color: GREY });
+    txt(560, 700, 'Romanian 4th', { size: 28, color: GREY });
+    // the two arms
+    arrow([[560, 200], [470, 330], [330, 440], [270, 470]], { w: 6 });
+    arrow([[640, 790], [470, 640], [320, 520], [278, 492]], { w: 6 });
+    txt(570, 190, 'Nov 19', { size: 30, bold: true });
+    txt(650, 815, 'Nov 20', { size: 30, bold: true });
+    // they meet
+    hi(100, 420, 150, 40);
+    star(250, 480, 30);
+    txt(110, 450, 'Kalach', { size: 32, bold: true });
+    txt(110, 530, 'Nov 23:', { size: 30 });
+    txt(110, 564, 'ring closed', { size: 30 });
+  },
+  5() {
+    title('The dual-ICP pincer', 'one account, two buyers');
+    rect(330, 210, 560, 560, { w: 3 });
+    txt(610, 250, 'THE ACCOUNT', { size: 30, anchor: 'middle', color: GREY, bold: true });
+    person(470, 380, 1.1); txt(470, 450, 'CISO', { size: 30, bold: true, anchor: 'middle' }); txt(470, 482, 'owns the risk', { size: 26, anchor: 'middle', color: GREY });
+    person(750, 640, 1.1); txt(750, 710, 'Head of Eng', { size: 30, bold: true, anchor: 'middle' }); txt(750, 742, 'owns the code', { size: 26, anchor: 'middle', color: GREY });
+    arrow([[90, 250], [230, 300], [400, 350]], { w: 5 });
+    arrow([[90, 760], [400, 760], [690, 650]], { w: 5 });
+    txt(70, 230, '1  weak flank', { size: 32 });
+    txt(70, 815, '1  weak flank', { size: 32 });
+    hi(940, 360, 200, 38);
+    txt(950, 390, '2  same week', { size: 30, bold: true });
+    // they meet
+    curve([[520, 420], [610, 500], [700, 590]], { w: 3, dash: [8, 8] });
+    star(610, 510, 32);
+    txt(940, 520, '3  they meet:', { size: 30, bold: true });
+    txt(970, 556, 'one shared', { size: 30 });
+    txt(970, 588, 'number', { size: 30 });
+    line(930, 540, 650, 512, { w: 2, color: GREY });
+  },
+  6() {
+    title('Königgrätz, 1866', 'Moltke gives the goal, not the route');
+    rect(520, 380, 250, 150, { fill: GREY, color: GREY, gap: 10 });
+    txt(645, 570, 'Austria', { size: 30, bold: true, anchor: 'middle', color: GREY });
+    arrow([[120, 410], [470, 420]], { w: 5 }); txt(120, 395, '1st Army', { size: 30 });
+    arrow([[120, 560], [300, 540], [470, 500]], { w: 5 }); txt(120, 600, 'Elbe Army', { size: 30 });
+    // the Crown Prince arriving on the flank
+    arrow([[960, 190], [900, 290], [800, 400]], { w: 7 });
+    hi(860, 160, 300, 40);
+    txt(870, 190, '2nd Army, 2:30 pm', { size: 30, bold: true });
+    // telegraph down, riders instead
+    line(300, 720, 300, 600, { w: 3 }); line(270, 620, 330, 620, { w: 3 });
+    line(270, 600, 330, 650, { w: 4, color: INK }); txt(345, 640, 'telegraph down', { size: 28, color: GREY });
+    curve([[340, 700], [600, 690], [900, 520], [940, 300]], { w: 2.5, dash: [4, 12] });
+    txt(560, 740, '2 riders, 32 km, with the intent', { size: 32 });
+  },
+  7() {
+    title('Orders, not playbooks');
+    // the playbook
+    rect(90, 190, 380, 600, { w: 3 });
+    txt(280, 236, 'PLAYBOOK v7', { size: 32, bold: true, anchor: 'middle' });
+    for (let k = 0; k < 13; k++) { txt(115, 290 + k * 38, `${k + 1}.`, { size: 24, color: GREY }); line(160, 284 + k * 38, 160 + 120 + ((k * 53) % 150), 284 + k * 38, { color: GREY, w: 2.5 }); }
+    line(90, 190, 470, 790, { w: 5 }); line(470, 190, 90, 790, { w: 5 });
+    txt(280, 830, '(broke in week 1)', { size: 28, anchor: 'middle', color: GREY });
+    // the order card
+    rect(570, 230, 540, 470, { w: 3 });
+    txt(600, 282, 'ORDER', { size: 30, bold: true });
+    hi(592, 318, 150, 38);
+    txt(600, 348, 'INTENT', { size: 30, bold: true });
+    txt(600, 388, '20 real conversations, learn', { size: 30 }); txt(600, 420, 'if the new angle lands', { size: 30 });
+    txt(600, 486, 'LIMITS', { size: 30, bold: true });
+    txt(600, 526, 'budget, discount floor,', { size: 30 }); txt(600, 558, 'off-limits accounts', { size: 30 });
+    txt(600, 622, 'RESOURCES', { size: 30, bold: true });
+    txt(600, 662, '2 people, tools, $', { size: 30 });
+    txt(840, 760, 'the how?  →  team decides', { size: 30, anchor: 'middle' });
+  },
+  8() {
+    title('Three moves, one board');
+    const cols = [[230, 'pick your', 'fights'], [600, 'both flanks,', 'same week'], [970, 'intent,', 'not script']];
+    cols.forEach(([x, a, b], i) => {
+      rect(x - 155, 210, 310, 380, { w: 3 });
+      txt(x, 256, String(i + 1), { size: 34, bold: true, anchor: 'middle' });
+      if (i === 0) { hills(x - 120, 420, 3, 80); rect(x - 26, 352, 52, 30, { fill: INK, gap: 6 }); }
+      if (i === 1) { circle(x, 380, 70, { fill: GREY, color: GREY }); arrow([[x - 120, 300], [x - 100, 370], [x - 42, 388]]); arrow([[x + 120, 300], [x + 100, 370], [x + 42, 388]]); }
+      if (i === 2) { rect(x - 80, 310, 160, 120, { w: 2.5 }); txt(x, 380, 'INTENT', { size: 30, bold: true, anchor: 'middle' }); }
+      txt(x, 500, a, { size: 32, anchor: 'middle', bold: true }); txt(x, 540, b, { size: 32, anchor: 'middle', bold: true });
+    });
+    hi(240, 660, 720, 46);
+    txt(600, 694, 'buyers ≠ the enemy. the status quo is.', { size: 34, anchor: 'middle', bold: true });
+    txt(600, 760, 'Fabius · Uranus · Moltke', { size: 30, anchor: 'middle', color: GREY });
+  },
+};
+
+const n = new URLSearchParams(location.search).get('n') || '1';
+frame();
+boards[n]();
+document.body.dataset.done = '1';
+</script>
+</body></html>
