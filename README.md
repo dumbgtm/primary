@@ -45,7 +45,24 @@ tags: ["tag-one", "tag-two"]
 Body in markdown.
 ```
 
-Then generate an OG image for it (see below) at `public/og/blog/my-new-post.png`.
+Optional frontmatter for SEO/AEO (see `src/content/blog/are-ai-sdrs-worth-it.md` for a full example):
+
+- `stage`: `dumb`, `working`, `everywhere` or `boring`.
+- `faq`: list of `{ q, a }`. Rendered at the end of the post and as FAQPage structured data.
+- `sources`: list of `{ title, url, publisher?, date? }`. Rendered as a numbered list and as citations in the BlogPosting structured data.
+- `updatedDate`: set when a post is meaningfully revised.
+
+Every post also gets BlogPosting + BreadcrumbList JSON-LD, a canonical URL, and an entry in
+`/llms.txt`, `/llms-full.txt` and the sitemap automatically.
+
+Then generate an OG image for it (see below) at `public/og/blog/my-new-post.png`. Quickest way:
+
+```
+python3 scripts/make-og.py my-new-post memo=005 stage=3 "date=Oct 14, 2026" \
+  "title=Post title" "italic=punchline part" "fig=Short label" "caption=One-line caption."
+```
+
+`fig` and `caption` are optional and add the mini Fig. 1 loop chart with a marker on the post's stage.
 
 Push to the connected branch and Cloudflare rebuilds and redeploys automatically (once
 Workers Builds is connected — see below).
