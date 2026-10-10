@@ -16,3 +16,6 @@ export const STAGE_KEYS = Object.keys(STAGES) as Stage[];
 
 // Rough read time for a markdown body (230 wpm, minimum 1 minute).
 export const readTime = (body: string) => Math.max(1, Math.round(body.split(/\s+/).filter(Boolean).length / 230));
+
+// Number of slides in a Dumb Ideas piece: slides are separated by `---` lines in the body.
+export const slideCount = (body: string) => body.split(/^\s*---\s*$/m).filter((s) => s.trim()).length;

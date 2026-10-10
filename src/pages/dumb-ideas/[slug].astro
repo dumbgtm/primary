@@ -1,0 +1,268 @@
+---
+// A Dumb Ideas piece. The server renders the whole piece as one normal article
+// (what search engines, AI crawlers and no-JS readers get). The script below then
+// splits it into slides at each <hr> (`---` in markdown) and adds Back / Next.
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import HolePunch from '../../components/HolePunch.astro';
+import Icon from '../../components/Icon.astro';
+import MemoHeader from '../../components/MemoHeader.astro';
+import StageBadge from '../../components/StageBadge.astro';
+import { STAGES, slideCount } from '../../lib/site';
+import { existsSync } from 'node:fs';
+
+export async function getStaticPaths() {
+  const ideas = (await getCollection('ideas', ({ data }) => !data.draft))
+    .sort((a, b) => a.data.pubDate.valueOf() - b.data.pubDate.valueOf());
+  return ideas.map((idea, i) => ({ params: { slug: idea.slug }, props: { idea, n: i + 1 } }));
+}
+
+const { idea, n } = Astro.props;
+const { Content } = await idea.render();
+const d = idea.data;
+const total = slideCount(idea.body);
+const date = d.pubDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+const stage = d.stage ? STAGES[d.stage] : null;
+const ogImage = existsSync(`public/og/ideas/${idea.slug}.png`) ? `/og/ideas/${idea.slug}.png` : '/og/default.png';
+const pageUrl = new URL(`/dumb-ideas/${idea.slug}/`, Astro.site).href;
+const org = { '@type': 'Organization', name: 'dumbGTM', url: 'https://www.dumbgtm.com/' };
+const jsonLd: Record<string, unknown>[] = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: d.title,
+    description: d.description,
+    datePublished: d.pubDate.toISOString(),
+    dateModified: (d.updatedDate ?? d.pubDate).toISOString(),
+    image: new URL(d.cover ?? ogImage, Astro.site).href,
+    url: pageUrl,
+    mainEntityOfPage: pageUrl,
+    author: org,
+    publisher: { ...org, logo: { '@type': 'ImageObject', url: 'https://www.dumbgtm.com/brand/dumbgtm-mark-512.png' } },
+    keywords: d.tags.join(', '),
+    ...(d.sources.length && {
+      citation: d.sources.map((s) => ({ '@type': 'CreativeWork', name: s.title, url: s.url, ...(s.publisher && { publisher: s.publisher }) })),
+    }),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Dumb Ideas', item: 'https://www.dumbgtm.com/dumb-ideas/' },
+      { '@type': 'ListItem', position: 2, name: d.title, item: pageUrl },
+    ],
+  },
+];
+if (d.faq.length) {
+  jsonLd.push({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: d.faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+  });
+}
+const rows = [
+  { label: 'IDEA:', value: String(n).padStart(3, '0') },
+  { label: 'FROM:', value: 'dumbGTM' },
+  { label: 'DATE:', value: date },
+  { label: 'RE:', value: stage ? `Stage ${stage.n} of 4: ${stage.label}` : d.tags.join(', ') },
+];
+---
+<BaseLayout title={d.title} description={d.description} ogImage={d.cover ?? ogImage} ogType="article">
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  <article class="container-memo pt-12 sm:pt-16 pb-16">
+    <a href="/dumb-ideas" class="link t-label inline-flex items-center gap-[6px]"><Icon name="arrow-right" size={16} class="rotate-180" />All dumb ideas</a>
+
+    <header class="mt-8 max-w-[68ch] flex flex-col gap-6">
+      <MemoHeader rows={rows} bordered />
+      <h1 class="t-h1 text-ink">{d.title}</h1>
+      <div class="flex gap-2 flex-wrap items-center">
+        {d.stage && <StageBadge stage={d.stage} />}
+        {d.tags.map((tag) => <span class="tag">{tag}</span>)}
+        <span class="t-small inline-flex items-center gap-[6px] ml-1"><Icon name="folder" size={12} />{total} slides</span>
+      </div>
+      <p class="font-serif text-[20px] leading-[1.5] text-ink2">{d.description}</p>
+    </header>
+
+    <div class="deck mt-10" data-deck data-total={total}>
+      <div class="deck-bar" data-deck-ui hidden>
+        <span class="t-label" aria-live="polite">Slide <span data-cur>1</span> of {total}</span>
+        <ol class="deck-progress" aria-label="Slides">
+          {Array.from({ length: total }, (_, i) => (
+            <li><button type="button" data-goto={i} aria-label={`Go to slide ${i + 1}`}></button></li>
+          ))}
+        </ol>
+        <button type="button" class="deck-mode t-label link" data-mode>Read as one page</button>
+      </div>
+
+      <div class="deck-content prose-memo" data-deck-content>
+        <Content />
+      </div>
+
+      <div class="deck-nav" data-deck-ui hidden>
+        <button type="button" class="btn-secondary" data-prev><Icon name="arrow-right" size={16} class="rotate-180" />Back</button>
+        <span class="t-small hidden sm:inline">Use ← → keys, or swipe</span>
+        <button type="button" class="btn-primary" data-next><span data-next-label>Next</span><Icon name="arrow-right" size={16} /></button>
+      </div>
+    </div>
+
+    {(d.faq.length > 0 || d.sources.length > 0) && (
+      <div class="mt-16">
+        <HolePunch>
+          <div class="prose-memo">
+            {d.faq.length > 0 && (
+              <section aria-labelledby="faq">
+                <h2 id="faq">Frequently asked questions</h2>
+                {d.faq.map((f) => (<Fragment><h3>{f.q}</h3><p>{f.a}</p></Fragment>))}
+              </section>
+            )}
+            {d.sources.length > 0 && (
+              <section aria-labelledby="sources" class="sources">
+                <h2 id="sources">Sources</h2>
+                <ol>
+                  {d.sources.map((s) => (
+                    <li>
+                      <a href={s.url} rel="noopener">{s.title}</a>
+                      {(s.publisher || s.date) && <span class="sources-meta">{[s.publisher, s.date].filter(Boolean).join(', ')}</span>}
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            )}
+          </div>
+        </HolePunch>
+      </div>
+    )}
+  </article>
+</BaseLayout>
+
+<script>
+  const deck = document.querySelector<HTMLElement>('[data-deck]');
+  const content = deck?.querySelector<HTMLElement>('[data-deck-content]');
+  if (deck && content) {
+    // 1. Group the rendered article into slides, splitting at each <hr>.
+    const groups: Element[][] = [[]];
+    [...content.children].forEach((el) => {
+      if (el.tagName === 'HR') groups.push([]);
+      else groups[groups.length - 1].push(el);
+    });
+    const slides = groups.filter((g) => g.length).map((g, i) => {
+      const slide = document.createElement('section');
+      slide.className = 'slide';
+      slide.id = `slide-${i + 1}`;
+      slide.setAttribute('aria-roledescription', 'slide');
+      slide.setAttribute('aria-label', `${i + 1} of ${groups.length}`);
+      // The first image (a paragraph holding only an image, or a <figure>) becomes the slide's visual.
+      const visualEl = g.find((el) => el.tagName === 'FIGURE' || (el.tagName === 'P' && el.children.length === 1 && el.firstElementChild?.tagName === 'IMG' && !el.textContent?.trim()));
+      const text = document.createElement('div');
+      text.className = 'slide-text';
+      g.filter((el) => el !== visualEl).forEach((el) => text.appendChild(el));
+      if (visualEl) {
+        const visual = document.createElement('div');
+        visual.className = 'slide-visual';
+        visual.appendChild(visualEl);
+        slide.appendChild(visual);
+        slide.classList.add('has-visual');
+      }
+      slide.appendChild(text);
+      return slide;
+    });
+    content.replaceChildren(...slides);
+
+    // 2. Slide controls.
+    const cur = deck.querySelector<HTMLElement>('[data-cur]')!;
+    const dots = [...deck.querySelectorAll<HTMLButtonElement>('[data-goto]')];
+    const prev = deck.querySelector<HTMLButtonElement>('[data-prev]')!;
+    const next = deck.querySelector<HTMLButtonElement>('[data-next]')!;
+    const modeBtn = deck.querySelector<HTMLButtonElement>('[data-mode]')!;
+    let index = 0;
+
+    const show = (i: number, scroll = true) => {
+      index = Math.max(0, Math.min(slides.length - 1, i));
+      slides.forEach((s, k) => s.classList.toggle('is-active', k === index));
+      dots.forEach((d, k) => d.setAttribute('aria-current', k === index ? 'step' : 'false'));
+      dots.forEach((d, k) => d.classList.toggle('is-done', k <= index));
+      cur.textContent = String(index + 1);
+      prev.disabled = index === 0;
+      next.disabled = index === slides.length - 1;
+      next.querySelector('[data-next-label]')!.textContent = index === slides.length - 1 ? 'The end' : 'Next';
+      history.replaceState(null, '', `#slide-${index + 1}`);
+      if (scroll && deck.getBoundingClientRect().top < 0) deck.scrollIntoView({ block: 'start' });
+    };
+
+    const setMode = (slidesOn: boolean) => {
+      deck.classList.toggle('is-deck', slidesOn);
+      modeBtn.textContent = slidesOn ? 'Read as one page' : 'View as slides';
+      deck.querySelector<HTMLElement>('.deck-nav')!.hidden = !slidesOn;
+      deck.querySelector<HTMLElement>('.deck-progress')!.style.visibility = slidesOn ? '' : 'hidden';
+      try { localStorage.setItem('dumbgtm-deck-mode', slidesOn ? 'slides' : 'page'); } catch {}
+    };
+
+    deck.querySelectorAll<HTMLElement>('[data-deck-ui]').forEach((el) => (el.hidden = false));
+    prev.addEventListener('click', () => show(index - 1));
+    next.addEventListener('click', () => show(index + 1));
+    dots.forEach((d, k) => d.addEventListener('click', () => show(k)));
+    modeBtn.addEventListener('click', () => setMode(!deck.classList.contains('is-deck')));
+
+    document.addEventListener('keydown', (e) => {
+      if (!deck.classList.contains('is-deck') || e.metaKey || e.ctrlKey || e.altKey) return;
+      const t = e.target as HTMLElement;
+      if (t.closest('input, textarea, select, [contenteditable]')) return;
+      if (e.key === 'ArrowRight') { e.preventDefault(); show(index + 1); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); show(index - 1); }
+    });
+
+    let sx = 0, sy = 0;
+    content.addEventListener('touchstart', (e) => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+    content.addEventListener('touchend', (e) => {
+      if (!deck.classList.contains('is-deck')) return;
+      const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) show(index + (dx < 0 ? 1 : -1));
+    }, { passive: true });
+
+    let saved: string | null = null;
+    try { saved = localStorage.getItem('dumbgtm-deck-mode'); } catch {}
+    const fromHash = Number(location.hash.match(/^#slide-(\d+)$/)?.[1] ?? 1) - 1;
+    setMode(saved !== 'page');
+    show(fromHash, false);
+  }
+</script>
+
+<style is:global>
+  .deck-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: 12px 0; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--ink); }
+  .deck-bar[hidden], .deck-nav[hidden] { display: none; }
+  .deck-progress { display: flex; gap: 6px; flex: 1 1 160px; }
+  .deck-progress li { flex: 1; }
+  .deck-progress button { display: block; width: 100%; height: 6px; border: 1px solid var(--ink); background: transparent; padding: 0; cursor: pointer; }
+  .deck-progress button.is-done { background: var(--ink); }
+  .deck-progress button[aria-current='step'] { background: var(--highlighter); }
+  .deck-mode { margin-left: auto; background: none; border: 0; padding: 0; cursor: pointer; }
+
+  .deck-content { max-width: none; }
+  .deck-content > hr { border: 0; height: 1px; margin: 48px 0; background: repeating-linear-gradient(90deg, var(--ink) 0 6px, transparent 6px 12px); }
+
+  /* One-page mode (and the no-JS fallback): slides stacked like an article. */
+  .slide { padding: 40px 0; border-bottom: 1px dashed var(--staple); }
+  .slide:last-child { border-bottom: 0; }
+  .slide-text { max-width: 64ch; }
+  .slide-text > :last-child { margin-bottom: 0; }
+  .slide-visual { margin-bottom: 28px; max-width: 760px; }
+  .slide-visual p { margin: 0; }
+  .slide-visual img { width: 100%; }
+
+  /* Slide mode */
+  .deck.is-deck .slide { display: none; border-bottom: 0; padding: 32px 0 28px; }
+  .deck.is-deck .slide.is-active { display: block; animation: slide-in 180ms ease-out; }
+  @media (min-width: 900px) {
+    .deck.is-deck .slide.has-visual.is-active { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 48px; align-items: center; min-height: 480px; }
+    .deck.is-deck .slide.has-visual .slide-visual { margin-bottom: 0; }
+    .deck.is-deck .slide.has-visual .slide-text { font-size: 18px; }
+    .deck.is-deck .slide:not(.has-visual).is-active { min-height: 360px; }
+    .deck.is-deck .slide-text h2:first-child { margin-top: 0; }
+  }
+  .deck.is-deck .slide-text h2:first-child { margin-top: 0; }
+  @keyframes slide-in { from { opacity: 0; transform: translateX(8px); } to { opacity: 1; transform: none; } }
+
+  .deck-nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 16px; border-top: 1px solid var(--ink); }
+  @media (max-width: 899px) { .deck-nav { position: sticky; bottom: 0; z-index: 5; background: var(--memo); padding-bottom: 12px; } }
+  .deck-nav button:disabled { opacity: .35; cursor: default; pointer-events: none; }
+</style>

@@ -3,7 +3,7 @@
 Usage (from the website folder, after `npm install`):
   python3 scripts/make-og.py <slug> memo=004 stage=3 "date=Oct 10, 2026" \
       "title=Post title" "italic=punchline part" "fig=AI SDRs" "caption=Short caption."
-Writes public/og/blog/<slug>.png. Needs: pip install playwright (Chromium installed).
+Writes public/og/blog/<slug>.png. For a Dumb Ideas piece pass ideas/<slug> and path=dumb-ideas. Needs: pip install playwright (Chromium installed).
 """
 import functools, http.server, re, sys, threading, urllib.parse
 from pathlib import Path
@@ -27,7 +27,7 @@ srv = http.server.ThreadingHTTPServer(('127.0.0.1', 0), handler)
 threading.Thread(target=srv.serve_forever, daemon=True).start()
 try:
     url = f'http://127.0.0.1:{srv.server_port}/scripts/_og-local.html?' + urllib.parse.urlencode(pairs)
-    out = root / 'public/og/blog' / f'{slug}.png'
+    out = root / 'public/og' / (f'{slug}.png' if '/' in slug else f'blog/{slug}.png')
     with sync_playwright() as p:
         b = p.chromium.launch()
         pg = b.new_page(viewport={'width': 1200, 'height': 630})

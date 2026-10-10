@@ -7,11 +7,18 @@ export const GET: APIRoute = async ({ site }) => {
   const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
     (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
   );
+  const ideas = (await getCollection('ideas', ({ data }) => !data.draft)).sort(
+    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+  );
   const base = site!.href.replace(/\/$/, '');
   const out = ['# dumbGTM: full text of all posts', ''];
-  for (const p of posts) {
+  const entries = [
+    ...ideas.map((p) => ({ p, url: `${base}/dumb-ideas/${p.slug}/` })),
+    ...posts.map((p) => ({ p, url: `${base}/blog/${p.slug}/` })),
+  ];
+  for (const { p, url } of entries) {
     out.push(`# ${p.data.title}`, '');
-    out.push(`URL: ${base}/blog/${p.slug}/`);
+    out.push(`URL: ${url}`);
     out.push(`Published: ${p.data.pubDate.toISOString().slice(0, 10)}`);
     if (p.data.stage) out.push(`Stage: ${STAGES[p.data.stage].label}`);
     out.push('', `> ${p.data.description}`, '', p.body.trim(), '');

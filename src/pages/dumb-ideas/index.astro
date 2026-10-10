@@ -1,0 +1,75 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import MemoHeader from '../../components/MemoHeader.astro';
+import StageBadge from '../../components/StageBadge.astro';
+import Stamp from '../../components/Stamp.astro';
+import Icon from '../../components/Icon.astro';
+import { getCollection } from 'astro:content';
+import { slideCount } from '../../lib/site';
+import { existsSync } from 'node:fs';
+
+// Card image: frontmatter cover, else the share image if it exists, else the site default.
+const coverFor = (slug: string, cover?: string) => cover ?? (existsSync(`public/og/ideas/${slug}.png`) ? `/og/ideas/${slug}.png` : '/og/default.png');
+
+const all = (await getCollection('ideas', ({ data }) => !data.draft))
+  .sort((a, b) => a.data.pubDate.valueOf() - b.data.pubDate.valueOf());
+const items = all.map((idea, i) => ({ idea, n: i + 1 })).reverse();
+const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+---
+<BaseLayout title="Dumb Ideas" description="Long-form, visual breakdowns of marketing ideas that sound dumb. Each one is a short set of slides you click through, or read as one page.">
+  <section class="container-memo pt-12 sm:pt-16 pb-8">
+    <div class="max-w-[760px] flex flex-col gap-7">
+      <MemoHeader rows={[
+        { label: 'TO:', value: 'All readers' },
+        { label: 'FROM:', value: 'dumbGTM' },
+        { label: 'RE:', value: 'One idea at a time, with pictures' },
+      ]} />
+      <h1 class="t-h1 text-ink">Dumb Ideas</h1>
+      <p class="t-body-mono max-w-[60ch]">
+        The longer pieces. Each one takes a single marketing idea that sounds dumb and walks through it in a few slides with visuals: where it came from, why it works or stopped working, and where it sits in the loop. Click through it, or read it as one page.
+      </p>
+    </div>
+  </section>
+
+  <section class="container-memo pb-16">
+    {items.length === 0 ? (
+      <div class="border-t border-ink pt-10 pb-6 flex flex-wrap items-center gap-8">
+        <div class="max-w-[46ch] flex flex-col gap-3">
+          <p class="font-serif text-[24px] leading-[1.2] text-ink">The first dumb idea is on its way.</p>
+          <p class="t-small">These take a while to make. In the meantime, the <a href="/blog" class="link">blog</a> has shorter takes on the same ideas.</p>
+        </div>
+        <Stamp text="Pending" rotate={-4} />
+      </div>
+    ) : (
+      <ol class="idea-grid border-t border-ink pt-8">
+        {items.map(({ idea, n }) => (
+          <li>
+            <a href={`/dumb-ideas/${idea.slug}`} class="idea-card flex flex-col gap-4 h-full">
+              <div class="idea-cover">
+                <img src={coverFor(idea.slug, idea.data.cover)} alt="" loading="lazy" width="1200" height="630" />
+              </div>
+              <div class="flex flex-wrap items-center gap-2 font-mono text-[12px] text-muted">
+                <span>Idea {String(n).padStart(3, '0')}</span>
+                {idea.data.stage && <StageBadge stage={idea.data.stage} />}
+                <span class="inline-flex items-center gap-[6px] ml-auto"><Icon name="folder" size={12} />{slideCount(idea.body)} slides</span>
+              </div>
+              <h2 class="font-serif text-[26px] leading-[1.15] text-ink">{idea.data.title}</h2>
+              <p class="font-mono text-[12px] text-muted leading-[1.6]">RE: {idea.data.description}</p>
+              <time class="font-mono text-[12px] text-ink mt-auto" datetime={idea.data.pubDate.toISOString()}>{fmt(idea.data.pubDate)}</time>
+            </a>
+          </li>
+        ))}
+      </ol>
+    )}
+  </section>
+</BaseLayout>
+
+<style>
+  .idea-grid { display: grid; gap: 40px 32px; grid-template-columns: 1fr; }
+  @media (min-width: 720px) { .idea-grid { grid-template-columns: 1fr 1fr; } }
+  .idea-card { padding-bottom: 24px; border-bottom: 1px solid var(--rule); }
+  .idea-cover { border: 1px solid var(--ink); background: #fff; overflow: hidden; }
+  .idea-cover img { display: block; width: 100%; height: auto; aspect-ratio: 1200 / 630; object-fit: cover; }
+  .idea-card h2 { transition: background-color 120ms ease-out; }
+  .idea-card:hover h2 { text-decoration: underline; text-underline-offset: 4px; }
+</style>

@@ -67,6 +67,17 @@ python3 scripts/make-og.py my-new-post memo=005 stage=3 "date=Oct 14, 2026" \
 Push to the connected branch and Cloudflare rebuilds and redeploys automatically (once
 Workers Builds is connected — see below).
 
+## Publishing a Dumb Ideas piece (slides)
+
+Dumb Ideas are the long-form visual pieces at `/dumb-ideas`. Copy `src/content/ideas/_template.md`
+to `src/content/ideas/<slug>.md` (files starting with `_` are never published). Each `---` line in
+the body starts a new slide (leave blank lines around it); the first image in a slide becomes its
+visual. Put slide images in `public/ideas/<slug>/`. The page is rendered as one normal article for
+search engines and no-JS readers, and turned into slides in the browser.
+
+Share image: `python3 scripts/make-og.py ideas/<slug> path=dumb-ideas memo=001 ...` writes
+`public/og/ideas/<slug>.png` (also used as the card image unless `cover` is set).
+
 ## Generating OG share images
 
 Every page has a branded 1200x630 image for link previews (`og:image`/`twitter:image`),

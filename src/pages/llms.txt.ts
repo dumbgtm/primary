@@ -7,6 +7,9 @@ export const GET: APIRoute = async ({ site }) => {
   const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
     (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
   );
+  const ideas = (await getCollection('ideas', ({ data }) => !data.draft)).sort(
+    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+  );
   const base = site!.href.replace(/\/$/, '');
   const lines = [
     '# dumbGTM',
@@ -21,6 +24,12 @@ export const GET: APIRoute = async ({ site }) => {
       const stage = p.data.stage ? ` [Stage: ${STAGES[p.data.stage].label}]` : '';
       return `- [${p.data.title}](${base}/blog/${p.slug}/): ${p.data.description}${stage}`;
     }),
+    '',
+    '## Dumb Ideas (long-form visual pieces)',
+    '',
+    ...(ideas.length
+      ? ideas.map((p) => `- [${p.data.title}](${base}/dumb-ideas/${p.slug}/): ${p.data.description}${p.data.stage ? ` [Stage: ${STAGES[p.data.stage].label}]` : ''}`)
+      : ['- None published yet.']),
     '',
     '## Optional',
     '',

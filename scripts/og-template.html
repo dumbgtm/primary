@@ -92,7 +92,7 @@
       <div class="head"><img class="logo" src="${LOGO}" alt="dumbgtm">
         <div class="right"><span>Memo ${esc(q.get('memo') || '001')}</span>${n ? `<span class="stage-tag">${mark(n)}§${n} ${NAMES[n]}</span>` : ''}</div></div>
       ${fig ? `<div class="body">${titleHtml}${loopFig(Number(n) || 3, fig)}</div>` : titleHtml}
-      <div class="foot">${esc(q.get('date') || '')} · dumbgtm.com/blog</div>
+      <div class="foot">${esc(q.get('date') || '')} · dumbgtm.com/${esc(q.get('path') || 'blog')}</div>
       <div class="stamp" style="transform: rotate(4deg)${fig ? '; right: 560px; bottom: 128px' : ''}"><span>Filed</span></div>`;
   } else {
     c.innerHTML = `
