@@ -222,6 +222,10 @@ const rows = [
     let saved: string | null = null;
     try { saved = localStorage.getItem('dumbgtm-deck-mode'); } catch {}
     const fromHash = Number(location.hash.match(/^#slide-(\d+)$/)?.[1] ?? 1) - 1;
+    window.addEventListener('hashchange', () => {
+      const h = Number(location.hash.match(/^#slide-(\d+)$/)?.[1] ?? 0);
+      if (h && h - 1 !== index) { if (!deck.classList.contains('is-deck')) setMode(true); show(h - 1); }
+    });
     setMode(saved !== 'page');
     show(fromHash, false);
   }
