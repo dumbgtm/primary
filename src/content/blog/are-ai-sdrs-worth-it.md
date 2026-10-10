@@ -91,7 +91,7 @@ All of the clear wins have the same thing in common: the person on the other end
 
 ## When it isn't
 
-1. **Cold outbound to strangers at high volume.** This is the use case most vendors lead with and the one with the weakest results. Cold email already averages a few percent reply rate. Sending ten times more of it mostly means ten times more people learning to ignore you. We wrote a longer rant about this in [Your AI SDR isn't a rep](/blog/ai-sdr-spam).
+1. **Cold outbound to strangers at high volume.** This is the use case most vendors lead with and the one with the weakest results. Cold email already averages a few percent reply rate. Sending ten times more of it mostly means ten times more people learning to ignore you. We wrote a longer rant about this in [Your AI SDR isn't a rep](/blog/ai-sdr-spam), and covered what still works in [Does cold email still work?](/blog/does-cold-email-still-work)
 2. **Replacing a rep before your messaging works.** Lemkin's summary of SaaStr's test was that the agents "scale what works." If a person can't get replies with your current message and target list, software sending it 3,000 times a month won't fix that.
 3. **Complex, expensive deals.** In the same SaaStr piece, a public company CRO described AI SDRs that created plenty of pipeline and zero closed deals. Long sales cycles with several decision makers still need a person who can read a room.
 4. **Teams with nobody to run it.** If no one has 15+ hours a week to feed lists, review drafts and tune the agent, results drift down. SaaStr said its response rates moved 10 to 20% depending on how much attention the agents got that week.
