@@ -9,13 +9,22 @@ import SocialButton from '../components/SocialButton.astro';
 import StageBadge from '../components/StageBadge.astro';
 import Stamp from '../components/Stamp.astro';
 import { getCollection } from 'astro:content';
-import { STAGES, STAGE_KEYS, YOUTUBE_URL, LINKEDIN_URL, readTime } from '../lib/site';
+import { STAGES, STAGE_KEYS, YOUTUBE_URL, LINKEDIN_URL, readTime, slideCount } from '../lib/site';
+import { existsSync } from 'node:fs';
 
 const all = (await getCollection('blog', ({ data }) => !data.draft))
   .sort((a, b) => a.data.pubDate.valueOf() - b.data.pubDate.valueOf());
 const numbered = all.map((p, i) => ({ post: p, n: i + 1 })).reverse();
 const featured = numbered[0];
 const rest = numbered.slice(1, 3);
+// Dumb Ideas: newest piece is featured under the hero; up to two earlier ones listed below it.
+const ideas = (await getCollection('ideas', ({ data }) => !data.draft))
+  .sort((a, b) => a.data.pubDate.valueOf() - b.data.pubDate.valueOf())
+  .map((idea, i) => ({ idea, n: i + 1 }))
+  .reverse();
+const latestIdea = ideas[0];
+const earlierIdeas = ideas.slice(1, 3);
+const ideaImage = (slug: string, cover?: string) => cover ?? (existsSync(`public/og/ideas/${slug}.png`) ? `/og/ideas/${slug}.png` : '/og/default.png');
 const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 
 const stageCopy = {
@@ -57,10 +66,57 @@ const hasSocial = Boolean(YOUTUBE_URL || LINKEDIN_URL);
     </div>
   </section>
 
-  <!-- Section 1: the loop -->
+
+  <!-- Section 1: latest dumb idea (the main thing on the site) -->
+  {latestIdea && (
+    <section class="container-memo pb-16 sm:pb-24">
+      <div class="border-t border-ink pt-10">
+        <div class="flex items-baseline justify-between gap-4 mb-10">
+          <div>
+            <p class="t-label text-muted mb-3 inline-flex items-center gap-2"><Icon name="pencil" size={16} />Section 1: Latest dumb idea</p>
+            <h2 class="t-h1 text-ink">From the whiteboard</h2>
+          </div>
+          <a href="/dumb-ideas" class="link t-label inline-flex items-center gap-[6px] whitespace-nowrap">All dumb ideas<Icon name="arrow-right" size={16} /></a>
+        </div>
+        <a href={`/dumb-ideas/${latestIdea.idea.slug}`} class="idea-feature grid min-[900px]:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] gap-8 min-[900px]:gap-12 items-center">
+          <div class="carbon-copy">
+            <img src={ideaImage(latestIdea.idea.slug, latestIdea.idea.data.cover)} alt="" width="1200" height="900" loading="lazy" class="block w-full h-auto border border-ink bg-white" />
+          </div>
+          <div class="flex flex-col gap-5">
+            <p class="t-small inline-flex flex-wrap items-center gap-x-3 gap-y-1">
+              <span>Idea {String(latestIdea.n).padStart(3, '0')}</span>
+              <span class="inline-flex items-center gap-[6px]"><Icon name="folder" size={12} />{slideCount(latestIdea.idea.body)} slides</span>
+              <span>{fmt(latestIdea.idea.data.pubDate)}</span>
+            </p>
+            <h3 class="font-serif text-[32px] sm:text-[40px] leading-[1.08] text-ink">{latestIdea.idea.data.title}</h3>
+            <p class="t-body-mono max-w-[52ch]">{latestIdea.idea.data.description}</p>
+            <span class="btn-primary self-start">Click through it<Icon name="arrow-right" size={16} /></span>
+          </div>
+        </a>
+        {earlierIdeas.length > 0 && (
+          <div class="mt-12">
+            <p class="t-label text-muted mb-3">Earlier dumb ideas</p>
+            <ol class="border-t border-ink">
+              {earlierIdeas.map(({ idea, n }) => (
+                <li class="border-b border-rule">
+                  <a href={`/dumb-ideas/${idea.slug}`} class="earlier-idea grid grid-cols-[auto_1fr_auto] gap-6 items-baseline py-4 px-2">
+                    <span class="font-mono text-[12px] text-muted">Idea {String(n).padStart(3, '0')}</span>
+                    <span class="font-serif text-[22px] leading-[1.2] text-ink">{idea.data.title}</span>
+                    <span class="font-mono text-[12px] text-muted">{slideCount(idea.body)} slides</span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
+      </div>
+    </section>
+  )}
+
+  <!-- Section 2: the loop -->
   <section class="container-memo pb-16 sm:pb-24">
     <div class="border-t border-ink pt-10">
-      <p class="t-label text-muted mb-3">Section 1</p>
+      <p class="t-label text-muted mb-3">Section {latestIdea ? 2 : 1}</p>
       <h2 class="t-h1 text-ink mb-4">The lifecycle of a dumb idea.</h2>
       <p class="t-body-mono max-w-[60ch] mb-10">
         Most marketing "gamechangers" go through the same four stages. Then someone comes up with a new dumb idea and it starts over.
@@ -86,7 +142,7 @@ const hasSocial = Boolean(YOUTUBE_URL || LINKEDIN_URL);
   <!-- Section 2: what you'll find here -->
   <section class="bg-ink text-memo">
     <div class="container-memo py-16 sm:py-24">
-      <p class="t-label text-staple mb-3">Section 2</p>
+      <p class="t-label text-staple mb-3">Section {latestIdea ? 3 : 2}</p>
       <h2 class="t-h1 mb-10">What you'll find here</h2>
       <div class="grid sm:grid-cols-3 gap-10 sm:gap-8">
         {bits.map((bit, i) => (
@@ -108,7 +164,7 @@ const hasSocial = Boolean(YOUTUBE_URL || LINKEDIN_URL);
     <div class="container-memo py-16 sm:py-24">
       <div class="flex items-baseline justify-between gap-4 mb-10">
         <div>
-          <p class="t-label text-muted mb-3 inline-flex items-center gap-2"><Icon name="inbox" size={16} />Section 3: In tray</p>
+          <p class="t-label text-muted mb-3 inline-flex items-center gap-2"><Icon name="inbox" size={16} />Section {latestIdea ? 4 : 3}: In tray</p>
           <h2 class="t-h1 text-ink">New stuff</h2>
         </div>
         <a href="/blog" class="link t-label inline-flex items-center gap-[6px] whitespace-nowrap">All posts<Icon name="arrow-right" size={16} /></a>
@@ -146,7 +202,7 @@ const hasSocial = Boolean(YOUTUBE_URL || LINKEDIN_URL);
     <div class="bg-highlighter border border-ink p-6 sm:p-10 grid md:grid-cols-[auto_1fr_auto] gap-6 md:gap-10 items-center">
       <Icon name="video" size={48} class="text-ink" />
       <div>
-        <p class="t-label text-ink mb-3">Section 4: Audio-visual department</p>
+        <p class="t-label text-ink mb-3">Section {latestIdea ? 5 : 4}: Audio-visual department</p>
         <h2 class="t-h2 text-ink mb-2">Dumb ideas, also in video form</h2>
         <p class="font-mono text-[14px] leading-[1.6] text-ink">New breakdowns every week on YouTube, and shorter ones on LinkedIn.</p>
       </div>
@@ -164,6 +220,10 @@ const hasSocial = Boolean(YOUTUBE_URL || LINKEDIN_URL);
 </BaseLayout>
 
 <style>
+  .idea-feature:hover h3, .earlier-idea:hover span:nth-child(2) { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+  .idea-feature:hover .btn-primary { background: var(--blue-hover); }
+  .earlier-idea { transition: background-color 120ms ease-out; }
+  .earlier-idea:hover { background: var(--carbon); }
   .featured-link:hover h3 { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
   /* Disabled buttons on the highlighter panel sit on memo so they read as paper. */
   section :global(.bg-highlighter .btn-disabled) { background: var(--memo); }
