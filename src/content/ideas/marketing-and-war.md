@@ -1,5 +1,5 @@
 ---
-title: "Marketing and war: three generals, three GTM moves"
+title: "Marketing and War: The Logic Beyond Clichés"
 description: "What Fabius, Operation Uranus and Moltke can teach a GTM team: pick your fights, hit both flanks at once, and give your team the intent instead of a script."
 pubDate: 2026-10-10
 tags: ["strategy", "competition", "sales"]
@@ -30,7 +30,7 @@ sources:
 
 ![A whiteboard with three battles mapped to three GTM moves](/ideas/marketing-and-war/slide-1.png)
 
-"Marketing is war" has been a cliché since at least 1986, when Al Ries and Jack Trout published *Marketing Warfare*. Most of what came after is Sun Tzu quotes on LinkedIn. I still think generals are worth reading, because they spent whole careers on the same problems GTM teams have: limited resources, a bigger opponent, ground that's already taken, and information that always arrives late. So this piece skips the quotes and looks at three specific moves. Fabius, for when you're the smaller company. Operation Uranus, for winning an account with more than one buyer. Moltke, for running a team after the plan stops working.
+"Marketing is war" has been a cliché since at least 1986, when Al Ries and Jack Trout published *Marketing Warfare*. Most of what came after is Sun Tzu quotes on LinkedIn. I still think the great generals of history are worth reading for a wide range of life lessons. One of them, by some stretch of the imagination, can be GTM motions and plays. I think the biggest reason I'm writing this is because I am a student of chess and of military tactics, and I work in GTM. Combining elements from those and deriving analogies is fun to me. Here are three: Fabius, Operation Uranus and Moltke.
 
 ---
 
@@ -46,7 +46,7 @@ In 217 BC, Hannibal had just wiped out two Roman armies, at Trebia and Lake Tras
 
 ![The incumbent's strong ground in the middle, small wins planted around the edges](/ideas/marketing-and-war/slide-3.png)
 
-If you're the smaller company, the incumbent wants a pitched battle. Head keywords they've ranked for over a decade. Enterprise RFPs with 300-line security questionnaires. Feature checklists. The biggest booth at the conference. You'll lose all of those, and you'll feel brave doing it. The Fabian version is to stay on ground that suits you: a segment they underserve, a use case too small for their roadmap, a channel their brand team won't touch. Win those small fights, keep your burn low, and let their size slow them down. Big companies have a lot to defend and a lot of meetings before they can respond. Time can be on the side of the smaller army.
+If you're the smaller company, the incumbent wants a pitched battle. Head keywords they've ranked for over a decade. Enterprise RFPs with 300-line security questionnaires. Feature checklists. The biggest booth at the conference. You'll usually lose those. The Fabian version is to stay on ground that suits you: a segment they underserve, a use case too small for their roadmap, a channel their brand team won't touch. Win those small fights, keep your burn low, and let their size slow them down. Big companies have a lot to defend and a lot of meetings before they can respond, so being patient can work in your favour.
 
 ---
 
@@ -62,7 +62,7 @@ By November 1942, the German 6th Army had spent months fighting street by street
 
 ![An account with two buyers, two arrows arriving the same week, meeting at one shared number](/ideas/marketing-and-war/slide-5.png)
 
-Plenty of products don't have one buyer. Picture a security tool: the CISO owns the risk but can't change the code, and the head of engineering can change the code but doesn't own the risk. Each one is a weak flank, because each feels a gap the current setup doesn't close. Uranus gives you three rules for attacking both. Pick the flanks where each role feels real pain, even if only one of them owns the budget. Move on both in the same window, so one skeptic can't kill the deal before your champion exists. And make the arms meet, with one shared number or meeting they both care about. Two campaigns that never connect are just two campaigns.
+Plenty of products don't have one buyer. Picture a security tool: the CISO owns the risk but can't change the code, and the head of engineering can change the code but doesn't own the risk. Each one is a weak flank, because each feels a gap the current setup doesn't close. Uranus suggests three rules. Pick the flanks where each role feels real pain, even if only one of them owns the budget. Move on both in the same window, so one skeptic can't kill the deal before your champion exists. And make sure the two meet, through one shared number or a meeting they both care about. If they never connect, you're running two separate deals.
 
 ---
 
@@ -78,7 +78,7 @@ Helmuth von Moltke ran the Prussian General Staff from 1857 to 1888. His armies 
 
 ![A crossed-out 40-step playbook next to a short order card with intent, limits and resources](/ideas/marketing-and-war/slide-7.png)
 
-Most GTM plans break in the first week. Buyers don't react the way the persona doc said, a channel underdelivers, a competitor drops prices. The 40-slide plan becomes a [historical document](/blog/frameworks-are-a-hostage-situation). Moltke's version of a plan has three parts. Intent: "20 qualified conversations with mid-market security leads this quarter, so we learn if the compliance angle works." Limits: budget, a discount floor, accounts that are off limits. Resources: people, tools, money. The how belongs to the team, and you review against the intent instead of the plan. This only works if everyone shares the same context on the ICP, the positioning and the numbers. Otherwise you get five people running five strategies.
+Most GTM plans break in the first week or two of running them. I’ve seen this at companies of all sizes, with red tape and without. Buyers react differently than the persona doc said, or a channel underdelivers. The 40-slide plan becomes a [historical document](/blog/frameworks-are-a-hostage-situation). Moltke's version of a plan has three parts. Intent: "20 qualified conversations with security leads this quarter, to test the compliance angle." Limits: budget, a discount floor, accounts that are off limits. Resources: people, tools, money. The team owns the how, and you review against the intent. This only works if everyone shares context on the ICP, positioning and numbers. There is always the risk of getting five people running five strategies, so be mindful.
 
 ---
 
@@ -86,4 +86,4 @@ Most GTM plans break in the first week. Buyers don't react the way the persona d
 
 ![The three moves side by side: pick your fights, both flanks at once, intent over script](/ideas/marketing-and-war/slide-8.png)
 
-If I had to fit this on a sticky note: pick your fights, hit both flanks at once, and give your team the intent instead of the script. Fabius is for the company that's smaller than its competition. Uranus is for the account with more than one buyer. Moltke is for the team that has to keep going after the plan falls apart. The analogy has limits. Buyers aren't the enemy, and a lot of bad outbound comes from teams that take words like "target" and "attack" a little too seriously. The real opponent is usually the status quo. The poet Ennius said Fabius saved Rome by delaying. Good GTM moves often look just as unimpressive at the time.
+If I had to fit this on a sticky note: pick your fights, hit both flanks at once, and give your team the intent instead of the script. Fabius for the smaller company, Uranus for accounts with more than one buyer, Moltke for teams whose plan fell apart. The analogy has limits. Buyers aren't the enemy (nor are competitors in the literal sense), and a lot of bad outbound comes from teams that take words like "target" and "attack" a little too seriously. The real opponent is usually the status quo. The poet Ennius said Fabius saved Rome by delaying. I'd keep that in mind the next time a slower, less exciting plan gets dismissed in a meeting.
