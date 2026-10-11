@@ -1,0 +1,211 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Kalam;font-weight:400;src:url(node_modules/@fontsource/kalam/files/kalam-latin-400-normal.woff2)}
+@font-face{font-family:Kalam;font-weight:700;src:url(node_modules/@fontsource/kalam/files/kalam-latin-700-normal.woff2)}
+html,body{margin:0;background:#fff}
+svg{display:block}
+text{font-family:Kalam}
+</style></head>
+<body>
+<svg id="s" width="1200" height="900" viewBox="0 0 1200 900"></svg>
+<script type="module">
+import rough from './node_modules/roughjs/bundled/rough.esm.js';
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('s');
+const rc = rough.svg(svg);
+const INK = '#1d1d1f', GREY = '#8a8a86', GHOST = '#eeeeea', YEL = '#F5EE6A';
+let seed = 1; const S = () => (seed = (seed * 9301 + 49297) % 233280) || 1;
+const add = (n) => svg.appendChild(n);
+const el = (tag, attrs) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; };
+const txt = (x, y, s, o = {}) => {
+  const t = el('text', { x, y, 'font-size': o.size || 30, fill: o.color || INK });
+  if (o.bold) t.setAttribute('font-weight', 700);
+  if (o.anchor) t.setAttribute('text-anchor', o.anchor);
+  if (o.rotate) t.setAttribute('transform', `rotate(${o.rotate} ${x} ${y})`);
+  t.textContent = s; add(t); return t;
+};
+const line = (x1, y1, x2, y2, o = {}) => add(rc.line(x1, y1, x2, y2, { stroke: o.color || INK, strokeWidth: o.w || 3, roughness: o.r ?? 1.2, seed: S(), strokeLineDash: o.dash }));
+const curve = (pts, o = {}) => add(rc.curve(pts, { stroke: o.color || INK, strokeWidth: o.w || 3, roughness: o.r ?? 1.1, seed: S(), strokeLineDash: o.dash }));
+const head = (a, b, o = {}) => {
+  const ang = Math.atan2(b[1] - a[1], b[0] - a[0]), L = o.L || 22;
+  for (const d of [0.45, -0.45]) line(b[0], b[1], b[0] - L * Math.cos(ang + d), b[1] - L * Math.sin(ang + d), { color: o.color, w: o.w || 3, r: 0.8 });
+};
+const arrow = (pts, o = {}) => { curve(pts, o); head(pts[pts.length - 2], pts[pts.length - 1], o); };
+const rect = (x, y, w, h, o = {}) => add(rc.rectangle(x, y, w, h, { stroke: o.color || INK, strokeWidth: o.w || 3, roughness: o.r ?? 1.1, seed: S(), fill: o.fill, fillStyle: o.fillStyle || 'hachure', hachureGap: o.gap || 9, fillWeight: o.fw || 1.6 }));
+const circle = (x, y, d, o = {}) => add(rc.circle(x, y, d, { stroke: o.color || INK, strokeWidth: o.w || 3, roughness: o.r ?? 1.1, seed: S(), fill: o.fill, fillStyle: o.fillStyle || 'hachure', hachureGap: o.gap || 9 }));
+const ellipse = (x, y, w, h, o = {}) => add(rc.ellipse(x, y, w, h, { stroke: o.color || INK, strokeWidth: o.w || 3, roughness: o.r ?? 1.1, seed: S(), fill: o.fill, fillStyle: o.fillStyle || 'hachure', hachureGap: o.gap || 9 }));
+const poly = (pts, o = {}) => add(rc.polygon(pts, { stroke: o.color || INK, strokeWidth: o.w || 3, roughness: o.r ?? 1.1, seed: S(), fill: o.fill, fillStyle: o.fillStyle || 'hachure', hachureGap: o.gap || 9 }));
+// highlighter stroke behind text (draw first)
+const hi = (x, y, w, h = 34) => add(rc.rectangle(x, y, w, h, { stroke: 'none', fill: YEL, fillStyle: 'solid', roughness: 1.6, seed: S() }));
+const underline = (x, y, w) => line(x, y, x + w, y - 3, { w: 3, r: 1.4 });
+const person = (x, y, s = 1) => { circle(x, y - 46 * s, 34 * s, { w: 3 }); curve([[x - 30 * s, y + 18 * s], [x - 22 * s, y - 16 * s], [x, y - 24 * s], [x + 22 * s, y - 16 * s], [x + 30 * s, y + 18 * s]], { w: 3 }); };
+const hills = (x, y, n, w = 70) => { for (let i = 0; i < n; i++) curve([[x + i * w, y], [x + i * w + w / 2, y - 40], [x + (i + 1) * w, y]], { color: GREY, w: 2.5 }); };
+const star = (x, y, r = 26, o = {}) => { const p = []; for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.45 : r; p.push([x + rr * Math.cos(a), y + rr * Math.sin(a)]); } poly(p, { fill: o.fill || YEL, fillStyle: 'solid', w: 2.5 }); };
+
+// ---- the board itself: white surface, aluminium frame, tray with a marker and eraser ----
+function frame() {
+  add(el('rect', { x: 0, y: 0, width: 1200, height: 900, fill: '#e7e8ea' }));
+  add(el('rect', { x: 14, y: 14, width: 1172, height: 842, fill: '#cfd2d6' }));
+  add(el('rect', { x: 24, y: 24, width: 1152, height: 822, fill: '#fcfcfb' }));
+  // ghosting from an old, half-erased board
+  line(140, 760, 470, 735, { color: GHOST, w: 10, r: 2 });
+  ellipse(1000, 120, 210, 64, { color: GHOST, w: 7, r: 2.4 });
+  line(620, 70, 760, 104, { color: GHOST, w: 7, r: 2 });
+  // tray
+  add(el('rect', { x: 14, y: 856, width: 1172, height: 30, fill: '#c3c6cb' }));
+  add(el('rect', { x: 14, y: 856, width: 1172, height: 5, fill: '#aeb2b7' }));
+  add(el('rect', { x: 880, y: 862, width: 150, height: 16, rx: 4, fill: '#222' }));
+  add(el('rect', { x: 1030, y: 865, width: 20, height: 10, rx: 2, fill: '#555' }));
+  add(el('rect', { x: 700, y: 858, width: 120, height: 22, fill: '#3b3b3b' }));
+  add(el('rect', { x: 700, y: 874, width: 120, height: 6, fill: '#bdbdbd' }));
+}
+const title = (s, sub) => { txt(70, 100, s, { size: 54, bold: true }); underline(70, 116, Math.min(1000, s.length * 26)); if (sub) txt(72, 160, sub, { size: 32, color: GREY }); };
+
+
+const env = (x, y, w = 120, h = 80, o = {}) => { rect(x, y, w, h, { w: o.w || 3, color: o.color, fill: o.fill, fillStyle: o.fs || 'solid', gap: 8 }); line(x, y, x + w / 2, y + h * 0.55, { color: o.color || INK, w: 2.5 }); line(x + w, y, x + w / 2, y + h * 0.55, { color: o.color || INK, w: 2.5 }); };
+const phone = (x, y) => { rect(x, y, 90, 170, { w: 3.5 }); rect(x + 12, y + 22, 66, 110, { w: 2, color: GREY }); circle(x + 45, y + 150, 16, { w: 2 }); };
+const face = (x, y, r = 46) => { circle(x, y, r, { w: 3 }); circle(x - r * 0.3, y - r * 0.12, 5, { fill: INK, fillStyle: 'solid', w: 1 }); circle(x + r * 0.3, y - r * 0.12, 5, { fill: INK, fillStyle: 'solid', w: 1 }); curve([[x - r * 0.35, y + r * 0.25], [x, y + r * 0.45], [x + r * 0.35, y + r * 0.25]], { w: 2.5 }); };
+const boards = {
+  1() {
+    title('Is it cool to be human again?');
+    // the polished post
+    rect(80, 200, 470, 460, { w: 3, color: GREY });
+    circle(130, 250, 50, { color: GREY, w: 2 }); txt(170, 245, 'Thought Leader', { size: 24, bold: true, color: GREY }); txt(170, 274, '3rd+ · Promoted', { size: 20, color: GREY });
+    ['Thrilled to announce that', 'we are leveraging synergies', 'to drive best-in-class,', 'customer-centric outcomes', 'across the value chain.'].forEach((t, i) => txt(110, 340 + i * 40, t, { size: 26, color: GREY }));
+    txt(110, 560, '#growth #leadership #AI', { size: 22, color: GREY });
+    txt(315, 720, 'grammatically perfect', { size: 26, anchor: 'middle', color: GREY });
+    txt(600, 450, 'vs', { size: 46, bold: true, anchor: 'middle' });
+    // the person
+    face(870, 290, 50);
+    poly([[700, 380], [1110, 380], [1110, 600], [800, 600], [760, 650], [770, 600], [700, 600]], { w: 3 });
+    txt(730, 440, 'hey, quick one.', { size: 32 });
+    txt(730, 490, 'saw your post on pricing,', { size: 30 });
+    txt(730, 536, 'honestly disagreed. coffee?', { size: 30 });
+    hi(740, 690, 330, 44);
+    txt(905, 724, 'talks like a person', { size: 32, bold: true, anchor: 'middle' });
+  },
+  2() {
+    title('How we got here', 'humans in the buyer journey, roughly');
+    line(110, 700, 1100, 700, { w: 3 }); line(110, 700, 110, 220, { w: 3 });
+    txt(120, 250, 'humans', { size: 24, color: GREY });
+    txt(1090, 740, 'time →', { size: 24, color: GREY, anchor: 'end' });
+    curve([[120, 270], [330, 300], [520, 400], [720, 520], [900, 610], [1090, 650]], { w: 5 });
+    [[300, 'chatbots'], [500, 'sequences'], [700, 'AI SDRs'], [900, 'AI ads']].forEach(([x, s], i) => { line(x, 700, x, 715, { w: 3 }); txt(x, 750, s, { size: 26, anchor: 'middle' }); });
+    hi(640, 230, 470, 44);
+    txt(650, 262, '53% would consider switching', { size: 30, bold: true });
+    txt(650, 300, 'if a company used AI for service (Gartner)', { size: 22, color: GREY });
+  },
+  3() {
+    title('When everyone can', 'the value moves to what\'s hard to copy');
+    // one letter, back when few did it
+    env(110, 260, 160, 106, { w: 3.5 });
+    txt(190, 420, 'a few teams', { size: 28, anchor: 'middle' });
+    // the pile
+    for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) env(380 + c * 72 + (r % 2) * 18, 250 + r * 62, 96, 64, { color: GREY, w: 2.2, fill: '#fcfcfb' });
+    txt(560, 560, 'everyone', { size: 28, anchor: 'middle', color: GREY });
+    arrow([[720, 420], [800, 400], [870, 400]], { w: 4 });
+    txt(795, 370, 'value', { size: 26, anchor: 'middle' });
+    phone(930, 300);
+    hi(890, 520, 200, 42);
+    txt(990, 552, 'the phone', { size: 32, bold: true, anchor: 'middle' });
+    txt(110, 720, '"loved your podcast episode!"  x 10,000', { size: 30, color: GREY });
+  },
+  4() {
+    title('Put your humans forward');
+    // the widget
+    rect(300, 200, 600, 560, { w: 3.5 });
+    rect(300, 200, 600, 90, { w: 3.5 });
+    txt(340, 256, '🤖 Your Friendly Assistant', { size: 30, color: GREY });
+    line(330, 246, 760, 240, { w: 5 });
+    face(400, 370, 44);
+    hi(470, 340, 380, 42);
+    txt(480, 372, 'Priya, support team', { size: 32, bold: true });
+    txt(480, 418, 'usually replies in ~2 hours', { size: 26 });
+    rect(340, 480, 470, 90, { w: 2.5, color: GREY });
+    txt(360, 535, 'hey! what are you trying to do?', { size: 26 });
+    rect(340, 620, 520, 70, { w: 2.5, color: GREY });
+    txt(360, 665, 'type a message...', { size: 24, color: GREY });
+    txt(930, 330, 'a name', { size: 26 }); txt(930, 366, 'a face', { size: 26 }); txt(930, 402, 'a real', { size: 26 }); txt(930, 432, 'promise', { size: 26 });
+  },
+  5() {
+    title('Brag about their humanity');
+    // the usual team card
+    rect(90, 210, 420, 470, { w: 3, color: GREY });
+    face(300, 330, 60);
+    txt(300, 450, 'Jordan Lee', { size: 30, anchor: 'middle', color: GREY });
+    txt(300, 490, 'Senior Account Exec', { size: 24, anchor: 'middle', color: GREY });
+    line(90, 210, 510, 680, { w: 5 }); line(510, 210, 90, 680, { w: 5 });
+    txt(300, 730, 'tells you nothing', { size: 26, anchor: 'middle', color: GREY });
+    // the human version
+    rect(610, 210, 500, 470, { w: 3.5 });
+    face(680, 280, 40); txt(740, 290, 'Jordan', { size: 32, bold: true });
+    hi(640, 350, 300, 38);
+    txt(650, 380, 'what they think:', { size: 28, bold: true });
+    txt(650, 424, '"most RFPs are decided', { size: 26 }); txt(650, 458, ' before they\'re sent"', { size: 26 });
+    txt(650, 520, 'learned the hard way:', { size: 26, bold: true });
+    txt(650, 556, 'discounting too early', { size: 26 });
+    txt(650, 616, 'odd expertise:', { size: 26, bold: true });
+    txt(650, 652, 'procurement, weirdly', { size: 26 });
+  },
+  6() {
+    title('Do something that doesn\'t scale');
+    // café table
+    ellipse(380, 470, 460, 150, { w: 3.5 });
+    line(380, 545, 380, 720, { w: 3.5 }); line(300, 720, 460, 720, { w: 3.5 });
+    // cups
+    [[270, 440], [470, 430]].forEach(([x, y]) => { rect(x, y, 50, 50, { w: 2.5 }); curve([[x + 50, y + 12], [x + 68, y + 24], [x + 50, y + 38]], { w: 2.5 }); });
+    // name tags
+    rect(160, 230, 200, 110, { w: 2.5 }); txt(260, 270, 'HELLO', { size: 22, anchor: 'middle', bold: true }); txt(260, 316, 'Sam (eng)', { size: 28, anchor: 'middle' });
+    rect(420, 230, 200, 110, { w: 2.5 }); txt(520, 270, 'HELLO', { size: 22, anchor: 'middle', bold: true }); txt(520, 316, 'a customer', { size: 28, anchor: 'middle' });
+    // the list
+    txt(720, 290, 'cheap versions:', { size: 30, bold: true });
+    ['office hours at a café', 'dinner for six customers', 'a handwritten note'].forEach((t, i) => { rect(720, 330 + i * 70, 30, 30, { w: 2.5 }); line(726, 346 + i * 70, 736, 356 + i * 70, { w: 3 }); line(736, 356 + i * 70, 752, 330 + i * 70, { w: 3 }); txt(770, 356 + i * 70, t, { size: 28 }); });
+    hi(700, 600, 300, 44);
+    txt(712, 634, 'gets remembered', { size: 32, bold: true });
+  },
+  7() {
+    title('Where it breaks');
+    // mini loop chart
+    const RES = [[30,236],[122,230],[140,205],[215,72],[240,50],[268,54],[300,84],[340,98],[400,100]].map(([x, y]) => [x * 1.55 + 70, y * 1.5 + 230]);
+    const Z = [30,122.5,215,307.5,400].map((x) => x * 1.55 + 70);
+    line(Z[0], 230, Z[0], 600, { w: 3 }); line(Z[0], 600, Z[4] + 10, 600, { w: 3 });
+    [1, 2, 3].forEach((i) => line(Z[i], 250, Z[i], 600, { color: '#d8d8d4', w: 2 }));
+    ['§1 dumb', '§2 working', '§3 everywhere', '§4 boring'].forEach((s, i) => txt((Z[i] + Z[i + 1]) / 2, 636, s, { size: 22, anchor: 'middle', color: i === 1 || i === 2 ? INK : GREY, bold: i === 1 || i === 2 }));
+    curve(RES, { w: 4 });
+    const m = [Z[2] + 6, 230 + 72 * 1.5 - 4];
+    circle(m[0], m[1], 26, { fill: YEL, fillStyle: 'solid', w: 3 });
+    arrow([[m[0] + 20, m[1] + 30], [m[0] + 90, m[1] + 70]], { w: 3 });
+    txt(m[0] + 30, m[1] + 110, 'proof of humanity', { size: 28, bold: true });
+    // the costume badge
+    circle(960, 330, 190, { w: 3, color: GREY });
+    txt(960, 322, '100%', { size: 40, bold: true, anchor: 'middle', color: GREY });
+    txt(960, 362, 'HUMAN', { size: 32, bold: true, anchor: 'middle', color: GREY });
+    line(880, 250, 1040, 410, { w: 5 }); line(1040, 250, 880, 410, { w: 5 });
+    txt(960, 470, '(written by 3 tools)', { size: 24, anchor: 'middle', color: GREY });
+    txt(860, 560, 'and: don\'t promise', { size: 26 }); txt(860, 594, 'replies you can\'t staff', { size: 26 });
+  },
+  8() {
+    title('Show the humans');
+    // the automation box
+    rect(120, 260, 380, 300, { w: 3, color: GREY });
+    txt(310, 310, 'AUTOMATION', { size: 30, bold: true, anchor: 'middle', color: GREY });
+    ['routing', 'reminders', 'data entry', 'the busywork'].forEach((t, i) => txt(310, 370 + i * 42, t, { size: 26, anchor: 'middle', color: GREY }));
+    // gears
+    circle(460, 520, 60, { w: 2.5, color: GREY }); circle(460, 520, 22, { w: 2.5, color: GREY });
+    // the person, out front
+    person(820, 470, 2.1);
+    rect(740, 470, 160, 70, { w: 3, fill: '#fcfcfb', fillStyle: 'solid' });
+    txt(820, 498, 'HELLO, I\'M', { size: 18, bold: true, anchor: 'middle' });
+    txt(820, 528, 'a real person', { size: 22, anchor: 'middle' });
+    arrow([[520, 420], [600, 420], [660, 420]], { w: 3 });
+    hi(640, 640, 380, 46);
+    txt(830, 674, 'make the person visible', { size: 32, bold: true, anchor: 'middle' });
+  },
+};
+const n = new URLSearchParams(location.search).get('n') || '1';
+frame();
+boards[n]();
+document.body.dataset.done = '1';
+</script>
+</body></html>
